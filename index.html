@@ -269,7 +269,7 @@
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub Pages. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -670,18 +670,34 @@ function clearAllChats() {
   }
 }
 
+// Dedicated File Extraction Logic (Fixes disappearing files)
+function extractFilesFromConv(conv) {
+  if (!conv) return [];
+  const files = [];
+  const fileRegex = /```file:\s*([^\n]+)\s*\n([\s\S]*?)```/g;
+  conv.messages.forEach(msg => {
+    if (msg.role === 'assistant' && typeof msg.content === 'string') {
+      let match;
+      while ((match = fileRegex.exec(msg.content)) !== null) {
+        const filename = match[1].trim();
+        const content = match[2].trim();
+        if (!files.find(f => f.name === filename && f.content === content)) {
+          files.push({ name: filename, content: content });
+        }
+      }
+    }
+  });
+  return files;
+}
+
 // Markdown & File Extraction
 function renderMarkdown(text) {
   if (!text) return '';
   const placeholders = [];
-  const fileRegex = /```file:([^\n]+)\n([\s\S]*?)```/g;
+  // Use a local regex to replace the UI element, but don't mutate state.files here
+  const fileRegex = /```file:\s*([^\n]+)\s*\n([\s\S]*?)```/g;
   let tempText = text.replace(fileRegex, (m, p1, p2) => {
     const filename = p1.trim();
-    const content = p2.trim();
-    if (!state.files.find(f => f.name === filename && f.content === content)) {
-      state.files.push({ name: filename, content: content });
-      renderFiles();
-    }
     const ext = filename.split('.').pop().slice(0,4).toLowerCase();
     const placeholder = `[[FILE_PLACEHOLDER_${placeholders.length}]]`;
     placeholders.push(`
@@ -713,7 +729,7 @@ function renderMessages() {
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub Pages. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -729,13 +745,15 @@ function renderMessages() {
   
   area.innerHTML = '<div class="messages-inner" id="messagesInner"></div>';
   const inner = document.getElementById('messagesInner');
-  state.files = []; // Reset files and re-extract from history
+  
+  // Extract files reliably before rendering messages
+  state.files = extractFilesFromConv(conv);
+  renderFiles();
   
   conv.messages.forEach((msg, idx) => {
     inner.appendChild(renderMessage(msg, idx));
   });
   
-  renderFiles();
   setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
 }
 
@@ -752,7 +770,7 @@ function renderMessage(msg, idx) {
     contentHtml = `<img src="${msg.image}" style="max-width: 200px; border-radius: 12px; margin-bottom: 8px;">`;
     if (msg.content) contentHtml += renderMarkdown(msg.content);
   } else {
-    contentHtml = renderMarkdown(msg.content || (msg.tool_calls ? `*Using tool: ${msg.tool_calls[0].function.name}*` : ''));
+    contentHtml = renderMarkdown(msg.content || (msg.tool_calls ? `*🔧 Using tool: ${msg.tool_calls[0].function.name}*` : ''));
   }
   
   el.innerHTML = `
@@ -896,46 +914,63 @@ function closePreview(e) {
   document.getElementById('previewFrame').srcdoc = '';
 }
 
-// GitHub Integration
+// Robust GitHub Integration
 async function getOrCreateRepo() {
-  if (!state.ghToken) throw new Error('GitHub Token not set');
+  if (!state.ghToken) throw new Error('GitHub Token not set. Please add it in Settings > GitHub.');
   
-  // 1. Get User
+  toast('info', 'GitHub', 'Checking GitHub account...');
   const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
-  if (!userRes.ok) throw new Error('Invalid GitHub Token');
+  if (!userRes.ok) throw new Error('Invalid GitHub Token. Please check your PAT.');
   const user = await userRes.json();
   state.ghUser = user.login;
 
-  // 2. Check Repo
   const repoName = 'lumen-deploys';
+  let repoExists = false;
+  let defaultBranch = 'main';
+
   const checkRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
   
-  if (checkRes.status === 404) {
-    // Create Repo
+  if (checkRes.ok) {
+    repoExists = true;
+    const repoData = await checkRes.json();
+    defaultBranch = repoData.default_branch;
+  } else if (checkRes.status === 404) {
+    toast('info', 'GitHub', 'Creating lumen-deploys repository...');
     const createRes = await fetch('https://api.github.com/user/repos', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: repoName, auto_init: true })
+      body: JSON.stringify({ name: repoName, auto_init: true, description: 'Files deployed by Agent Lumen' })
     });
     if (!createRes.ok) throw new Error('Failed to create GitHub repo');
+    const newRepoData = await createRes.json();
+    defaultBranch = newRepoData.default_branch || 'main';
     
-    // Wait for repo to be fully initialized
-    await new Promise(r => setTimeout(r, 2000));
-    
-    // Enable Pages
-    await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ source: { branch: 'main', path: '/' } })
-    });
-  } else if (!checkRes.ok) {
+    // Wait for repo to be fully initialized on GitHub's backend
+    await new Promise(r => setTimeout(r, 3000));
+  } else {
     throw new Error('Failed to check GitHub repo');
   }
+
+  // Check and Enable Pages
+  toast('info', 'GitHub', 'Enabling GitHub Pages...');
+  const pagesCheckRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
+  
+  if (pagesCheckRes.status === 404) {
+    const pagesRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: { branch: defaultBranch, path: '/' } })
+    });
+    // We ignore the response body, because even if it fails, the file push will still work 
+    // and GitHub Pages might just need a manual toggle in rare cases.
+  }
+  
   saveState();
+  return defaultBranch;
 }
 
 async function deployToGitHub(filename, content) {
-  await getOrCreateRepo();
+  const defaultBranch = await getOrCreateRepo();
   
   const timestamp = new Date().getTime();
   const safeName = filename.replace(/[^a-zA-Z0-9.]/g, '_');
@@ -950,7 +985,7 @@ async function deployToGitHub(filename, content) {
       'Accept': 'application/vnd.github+json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ message: `Deploy ${filename} via Lumen`, content: encodedContent })
+    body: JSON.stringify({ message: `Deploy ${filename} via Lumen`, content: encodedContent, branch: defaultBranch })
   });
 
   if (!res.ok) {
@@ -995,7 +1030,7 @@ async function exportChatsToGithub() {
   if (!state.ghToken) return toast('error', 'Missing Token', 'Add GitHub PAT in Settings');
   toast('info', 'Syncing...', 'Uploading chat history to GitHub');
   try {
-    await getOrCreateRepo();
+    const defaultBranch = await getOrCreateRepo();
     const path = `lumen_data/chats.json`;
     const url = `https://api.github.com/repos/${state.ghUser}/lumen-deploys/contents/${path}`;
     
@@ -1007,7 +1042,7 @@ async function exportChatsToGithub() {
     const res = await fetch(url, {
       method: 'PUT',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: `Sync chats`, content: encodedContent, sha })
+      body: JSON.stringify({ message: `Sync chats`, content: encodedContent, sha, branch: defaultBranch })
     });
     if (!res.ok) throw new Error('Failed to sync');
     toast('success', 'Sync Complete', 'Chat history backed up');
@@ -1257,7 +1292,7 @@ async function generateResponse() {
       
       for (let tc of toolCallsArray) {
         try {
-          updateMessageContent(msgIdx, `Using tool: ${tc.function.name}...`);
+          updateMessageContent(msgIdx, `🔧 Using tool: ${tc.function.name}...`);
           let toolResult = await executeTool(tc);
           conv.messages.push({ role: 'tool', tool_call_id: tc.id, content: toolResult });
         } catch (err) {
@@ -1266,7 +1301,7 @@ async function generateResponse() {
       }
       
       // Second API call to process tool results
-      updateMessageContent(msgIdx, `Processing results...`);
+      updateMessageContent(msgIdx, `⏳ Processing results...`);
       const bodyPayload2 = { ...bodyPayload, stream: false, messages: [
         { role: 'system', content: state.systemPrompt },
         ...conv.messages.filter((m, i) => i !== msgIdx)
