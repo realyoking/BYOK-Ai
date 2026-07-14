@@ -160,6 +160,8 @@
   .btn-primary { background: var(--accent); color: white; box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3); }
   .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); width: 100%; }
   .btn-danger { background: var(--danger); color: white; width: 100%; }
+  .btn-link { background: var(--surface); color: var(--accent); border: 1px solid var(--border); width: 100%; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; padding: 11px 18px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; }
+  .btn-link:hover { background: var(--surface-hover); }
   .preset-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text); cursor: pointer; font-size: 13px; }
   .preset-btn:hover { background: var(--surface-hover); border-color: var(--accent); }
   .preset-btn b { display: block; margin-bottom: 4px; }
@@ -251,6 +253,9 @@
         </button>
       </div>
       <div class="header-right">
+        <button class="icon-btn" onclick="exportChatAsMarkdown()" title="Download Chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
           <svg id="themeIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
@@ -414,8 +419,12 @@
         <div class="form-group">
           <label>Personal Access Token (PAT)</label>
           <input type="password" class="form-input" id="ghTokenInput" placeholder="github_pat_...">
-          <small style="color: var(--warning); font-size: 11px;">⚠️ Token is stored in your browser only. We will automatically create a 'lumen-deploys' repo for your uploads.</small>
+          <small style="color: var(--warning); font-size: 11px; margin-top: 6px; display: block;">⚠️ Token is stored in your browser only. We will automatically create a 'lumen-deploys' repo for your uploads.</small>
         </div>
+        <a href="https://github.com/settings/tokens/new?description=Lumen%20AI%20Deploy&scopes=repo" target="_blank" class="btn-link" style="margin-bottom: 20px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Generate GitHub PAT (Pre-configured)
+        </a>
         <button class="btn btn-primary" onclick="saveGithubSettings()" style="margin-bottom: 20px;">Save GitHub Token</button>
         
         <div class="form-group">
@@ -437,6 +446,10 @@
         <div class="toggle-row">
           <div><div class="toggle-label">Send on Enter</div><div class="toggle-sub">Press Enter to send, Shift+Enter for newline</div></div>
           <div class="switch" id="enterSwitch" onclick="toggleEnter()"></div>
+        </div>
+        <div class="form-group" style="margin-top: 20px;">
+          <label>Danger Zone</label>
+          <button class="btn btn-danger" onclick="clearAllChats()">Clear All Chat History</button>
         </div>
       </div>
     </div>
@@ -504,7 +517,7 @@ let state = {
   presPenalty: parseFloat(localStorage.getItem('lumen_presPenalty') || '0'),
   maxTokens: parseInt(localStorage.getItem('lumen_maxTokens') || '4096'),
   ghToken: localStorage.getItem('lumen_ghToken') || '',
-  ghUser: localStorage.getItem('lumen_ghUser') || '', // Fetched dynamically
+  ghUser: localStorage.getItem('lumen_ghUser') || '', 
   attachedImage: null,
   tools: {
     search: localStorage.getItem('lumen_tool_search') !== 'false',
@@ -643,6 +656,18 @@ function renderConversations() {
     el.innerHTML = `<span class="conv-title">${escapeHtml(conv.title)}</span>`;
     c.appendChild(el);
   });
+}
+
+function clearAllChats() {
+  if (confirm('Are you sure you want to delete all chat history? This cannot be undone.')) {
+    state.conversations = [];
+    state.currentId = null;
+    state.files = [];
+    saveState();
+    renderConversations();
+    renderMessages();
+    toast('success', 'History Cleared');
+  }
 }
 
 // Markdown & File Extraction
@@ -796,6 +821,24 @@ function removeAttachedImage() {
   state.attachedImage = null;
   document.getElementById('imagePreviewStrip').classList.remove('visible');
   document.getElementById('imageFileInput').value = '';
+}
+
+// Chat Export
+function exportChatAsMarkdown() {
+  const conv = getCurrentConv();
+  if (!conv || conv.messages.length === 0) return toast('error', 'No chat', 'No conversation to export');
+  let md = `# ${conv.title}\n\n`;
+  conv.messages.forEach(msg => {
+    md += `**${msg.role === 'user' ? 'User' : 'Agent Lumen'}:**\n\n${msg.content}\n\n---\n\n`;
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${conv.title.replace(/\s+/g, '_')}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('success', 'Exported', 'Chat downloaded as Markdown');
 }
 
 // Preview Modal
