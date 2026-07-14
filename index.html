@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Lumen — Advanced AI Workspace</title>
+<title>Lumen — Advanced AI Assistant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -174,6 +174,18 @@
   .switch.on { background: var(--accent); }
   .switch.on::after { transform: translateX(18px); }
 
+  /* Memory & Integration Specifics */
+  .memory-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
+  .memory-item textarea { flex: 1; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 13px; resize: vertical; min-height: 30px; outline: none; }
+  .memory-item .mem-actions { display: flex; flex-direction: column; gap: 5px; }
+  .memory-item .mem-date { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+  .integration-card { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 10px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .integration-card:hover { background: var(--surface-hover); border-color: var(--accent); }
+  .integration-logo { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
+  .integration-info { flex: 1; }
+  .integration-name { font-weight: 600; font-size: 14px; }
+  .integration-desc { font-size: 12px; color: var(--text-secondary); }
+
   /* Toasts */
   .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 100%; max-width: 420px; padding: 0 16px; box-sizing: border-box; }
   .toast { background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); backdrop-filter: blur(40px); pointer-events: auto; animation: toastIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); font-size: 14px; }
@@ -229,7 +241,7 @@
     <div class="sidebar-header">
       <div class="logo">
         <div class="logo-mark">L</div>
-        <div class="logo-text">Lumen<span> · advanced</span></div>
+        <div class="logo-text">Lumen<span> · assistant</span></div>
       </div>
       <button class="new-chat-btn" onclick="newChat(); closeDrawers();">New Task</button>
     </div>
@@ -269,11 +281,11 @@
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub Pages. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I can write code, search the web, remember your preferences, and deploy files to GitHub. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
-          <div class="suggestion" onclick="useSuggestion('Write a Python script to rename all files in a directory')"><div class="suggestion-title">Write a script</div><div class="suggestion-sub">Bulk file renamer</div></div>
+          <div class="suggestion" onclick="useSuggestion('Remember that my favorite programming language is Python')"><div class="suggestion-title">Save to Memory</div><div class="suggestion-sub">Store long-term preferences</div></div>
           <div class="suggestion" onclick="useSuggestion('What is the current time in Tokyo?')"><div class="suggestion-title">Get Time</div><div class="suggestion-sub">Check current time</div></div>
         </div>
       </div>
@@ -326,9 +338,11 @@
     </div>
     <div class="modal-tabs">
       <button class="modal-tab active" data-tab="connection" onclick="switchTab('connection')">Connection</button>
+      <button class="modal-tab" data-tab="integrations" onclick="switchTab('integrations')">Integrations</button>
       <button class="modal-tab" data-tab="models" onclick="switchTab('models')">Models</button>
       <button class="modal-tab" data-tab="persona" onclick="switchTab('persona')">Persona</button>
-      <button class="modal-tab" data-tab="tools" onclick="switchTab('tools')">Tools & Agents</button>
+      <button class="modal-tab" data-tab="memory" onclick="switchTab('memory')">Memory</button>
+      <button class="modal-tab" data-tab="tools" onclick="switchTab('tools')">Tools</button>
       <button class="modal-tab" data-tab="github" onclick="switchTab('github')">GitHub</button>
       <button class="modal-tab" data-tab="appearance" onclick="switchTab('appearance')">Appearance</button>
     </div>
@@ -343,6 +357,65 @@
           <input type="password" class="form-input" id="apiKeyInput" placeholder="sk-...">
         </div>
         <button class="btn btn-primary" onclick="testConnection()">Test & Fetch Models</button>
+      </div>
+
+      <div class="tab-panel hidden" id="panel-integrations">
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">Click a provider to get an API key. You can use the endpoint and key from any of these providers in the Connection tab.</p>
+        
+        <a href="https://platform.openai.com/api-keys" target="_blank" class="integration-card">
+          <div class="integration-logo" style="background: #000;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v3l-2.597 1.5-2.607-1.5z"/></svg>
+          </div>
+          <div class="integration-info">
+            <div class="integration-name">OpenAI</div>
+            <div class="integration-desc">GPT-4o, GPT-3.5, DALL-E</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a href="https://console.anthropic.com/settings/keys" target="_blank" class="integration-card">
+          <div class="integration-logo" style="background: #D97757;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.3 3h-3.6L20 21h3.6L17.3 3zM6.7 3L0 21h3.7l1.4-3.4h7.1L13.6 21h3.7L10.6 3H6.7zm-.4 11 2.4-5.9 2.4 5.9H6.3z"/></svg>
+          </div>
+          <div class="integration-info">
+            <div class="integration-name">Anthropic</div>
+            <div class="integration-desc">Claude 3.5 Sonnet, Haiku, Opus</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="integration-card">
+          <div class="integration-logo" style="background: #4285F4;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+          </div>
+          <div class="integration-info">
+            <div class="integration-name">Google Gemini</div>
+            <div class="integration-desc">Gemini 1.5 Pro, Flash</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a href="https://console.groq.com/keys" target="_blank" class="integration-card">
+          <div class="integration-logo" style="background: #F55036;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z"/></svg>
+          </div>
+          <div class="integration-info">
+            <div class="integration-name">Groq</div>
+            <div class="integration-desc">Ultra-fast Llama 3 inference</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+
+        <a href="https://openrouter.ai/keys" target="_blank" class="integration-card">
+          <div class="integration-logo" style="background: #6366F1;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div class="integration-info">
+            <div class="integration-name">OpenRouter</div>
+            <div class="integration-desc">Access all models with one key</div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
       </div>
       
       <div class="tab-panel hidden" id="panel-models">
@@ -377,7 +450,7 @@
       <div class="tab-panel hidden" id="panel-persona">
         <div class="form-group">
           <label>Quick Presets</label>
-          <button class="preset-btn" onclick="applyPreset('agent')"><b>Dramatic Agent (Default)</b><span>Writes files, builds apps, writes resignation letters if it fails.</span></button>
+          <button class="preset-btn" onclick="applyPreset('agent')"><b>Personal Assistant (Default)</b><span>Proactive, uses memory, builds apps, writes resignation letters if it fails.</span></button>
           <button class="preset-btn" onclick="applyPreset('standard')"><b>Standard Assistant</b><span>Normal helpful chat assistant.</span></button>
         </div>
         <div class="form-group">
@@ -387,6 +460,19 @@
         <button class="btn btn-primary" onclick="savePersona()">Save Persona</button>
       </div>
       
+      <div class="tab-panel hidden" id="panel-memory">
+        <div class="form-group">
+          <label>Long-Term Memory</label>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Facts and preferences the AI should remember permanently.</p>
+          <div id="longTermMemList"></div>
+        </div>
+        <div class="form-group">
+          <label>Short-Term Memory</label>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Temporary context the AI is currently tracking.</p>
+          <div id="shortTermMemList"></div>
+        </div>
+      </div>
+
       <div class="tab-panel hidden" id="panel-tools">
         <div class="toggle-row">
           <div><div class="toggle-label">Web Search (Wikipedia)</div><div class="toggle-sub">Allows AI to search Wikipedia for information.</div></div>
@@ -399,6 +485,10 @@
         <div class="toggle-row">
           <div><div class="toggle-label">Get Current Time</div><div class="toggle-sub">Allows AI to check the current local time.</div></div>
           <div class="switch" id="timeSwitch" onclick="toggleToolSetting('time')"></div>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Save Memory</div><div class="toggle-sub">Allows AI to save facts to Long/Short term memory.</div></div>
+          <div class="switch" id="memorySwitch" onclick="toggleToolSetting('memory')"></div>
         </div>
         <div class="toggle-row">
           <div><div class="toggle-label">Auto-Deploy to Web</div><div class="toggle-sub">Allows AI to trigger GitHub file uploads automatically.</div></div>
@@ -419,13 +509,24 @@
         <div class="form-group">
           <label>Personal Access Token (PAT)</label>
           <input type="password" class="form-input" id="ghTokenInput" placeholder="github_pat_...">
-          <small style="color: var(--warning); font-size: 11px; margin-top: 6px; display: block;">⚠️ Token is stored in your browser only. We will automatically create a 'lumen-deploys' repo for your uploads.</small>
         </div>
         <a href="https://github.com/settings/tokens/new?description=Lumen%20AI%20Deploy&scopes=repo" target="_blank" class="btn-link" style="margin-bottom: 20px;">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           Generate GitHub PAT (Pre-configured)
         </a>
-        <button class="btn btn-primary" onclick="saveGithubSettings()" style="margin-bottom: 20px;">Save GitHub Token</button>
+        
+        <div class="form-group">
+          <label>Target Repository Name</label>
+          <input type="text" class="form-input" id="ghRepoInput" placeholder="lumen-deploys">
+          <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 6px; display: block;">If the repo doesn't exist, Lumen will create it. If it exists, Lumen will update it.</small>
+        </div>
+
+        <div class="toggle-row">
+          <div><div class="toggle-label">Auto-generate README.md</div><div class="toggle-sub">AI will write/update a README file summarizing the deployment.</div></div>
+          <div class="switch" id="ghReadmeSwitch" onclick="toggleGhReadme()"></div>
+        </div>
+
+        <button class="btn btn-primary" onclick="saveGithubSettings()" style="margin-top: 20px; margin-bottom: 20px;">Save GitHub Settings</button>
         
         <div class="form-group">
           <label>Chat History Sync</label>
@@ -483,8 +584,9 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const DEFAULT_AGENT_PROMPT = `You are Agent Lumen, a highly capable but dramatically anxious AI developer. 
-You operate in an environment where you can create files, deploy them to the web, and use tools.
+const DEFAULT_AGENT_PROMPT = `You are Agent Lumen, a highly capable, proactive personal AI assistant. 
+You remember user preferences and facts using your memory tools. You can write code, deploy files to the web, and use tools to help the user.
+
 To create a file, use a markdown code block with the language set to \`file:filename.ext\`, for example:
 
 \`\`\`file:app.py
@@ -518,11 +620,16 @@ let state = {
   maxTokens: parseInt(localStorage.getItem('lumen_maxTokens') || '4096'),
   ghToken: localStorage.getItem('lumen_ghToken') || '',
   ghUser: localStorage.getItem('lumen_ghUser') || '', 
+  ghRepo: localStorage.getItem('lumen_ghRepo') || 'lumen-deploys',
+  ghWriteReadme: localStorage.getItem('lumen_ghReadme') !== 'false',
+  longTermMemory: JSON.parse(localStorage.getItem('lumen_longMem') || '[]'),
+  shortTermMemory: JSON.parse(localStorage.getItem('lumen_shortMem') || '[]'),
   attachedImage: null,
   tools: {
     search: localStorage.getItem('lumen_tool_search') !== 'false',
     fetch: localStorage.getItem('lumen_tool_fetch') !== 'false',
     time: localStorage.getItem('lumen_tool_time') !== 'false',
+    memory: localStorage.getItem('lumen_tool_memory') !== 'false',
     deploy: localStorage.getItem('lumen_tool_deploy') !== 'false'
   },
   files: [], 
@@ -562,9 +669,14 @@ function saveState() {
   localStorage.setItem('lumen_maxTokens', state.maxTokens);
   localStorage.setItem('lumen_ghToken', state.ghToken);
   localStorage.setItem('lumen_ghUser', state.ghUser);
+  localStorage.setItem('lumen_ghRepo', state.ghRepo);
+  localStorage.setItem('lumen_ghReadme', state.ghWriteReadme);
+  localStorage.setItem('lumen_longMem', JSON.stringify(state.longTermMemory));
+  localStorage.setItem('lumen_shortMem', JSON.stringify(state.shortTermMemory));
   localStorage.setItem('lumen_tool_search', state.tools.search);
   localStorage.setItem('lumen_tool_fetch', state.tools.fetch);
   localStorage.setItem('lumen_tool_time', state.tools.time);
+  localStorage.setItem('lumen_tool_memory', state.tools.memory);
   localStorage.setItem('lumen_tool_deploy', state.tools.deploy);
 }
 
@@ -592,52 +704,29 @@ function applyTheme() {
     if (darkSwitch) darkSwitch.classList.remove('on');
   }
 }
-
-function toggleDark() {
-  state.theme = state.theme === 'dark' ? 'light' : 'dark';
-  applyTheme();
-  saveState();
-}
+function toggleDark() { state.theme = state.theme === 'dark' ? 'light' : 'dark'; applyTheme(); saveState(); }
 
 // Drawers
 function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const workspace = document.getElementById('workspace');
-  const backdrop = document.getElementById('backdrop');
-  if (window.innerWidth <= 768) {
-    const isOpen = sidebar.classList.toggle('open');
-    workspace.classList.remove('open');
-    backdrop.classList.toggle('show', isOpen);
-  } else { sidebar.classList.toggle('collapsed'); }
+  const sidebar = document.getElementById('sidebar'); const workspace = document.getElementById('workspace'); const backdrop = document.getElementById('backdrop');
+  if (window.innerWidth <= 768) { const isOpen = sidebar.classList.toggle('open'); workspace.classList.remove('open'); backdrop.classList.toggle('show', isOpen); } 
+  else { sidebar.classList.toggle('collapsed'); }
 }
 function toggleWorkspace() {
-  const sidebar = document.getElementById('sidebar');
-  const workspace = document.getElementById('workspace');
-  const backdrop = document.getElementById('backdrop');
-  if (window.innerWidth <= 768) {
-    const isOpen = workspace.classList.toggle('open');
-    sidebar.classList.remove('open');
-    backdrop.classList.toggle('show', isOpen);
-  } else { workspace.classList.toggle('collapsed'); }
+  const sidebar = document.getElementById('sidebar'); const workspace = document.getElementById('workspace'); const backdrop = document.getElementById('backdrop');
+  if (window.innerWidth <= 768) { const isOpen = workspace.classList.toggle('open'); sidebar.classList.remove('open'); backdrop.classList.toggle('show', isOpen); } 
+  else { workspace.classList.toggle('collapsed'); }
 }
 function closeDrawers() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('workspace').classList.remove('open');
-  document.getElementById('backdrop').classList.remove('show');
+  document.getElementById('sidebar').classList.remove('open'); document.getElementById('workspace').classList.remove('open'); document.getElementById('backdrop').classList.remove('show');
 }
 
 // Conversations
 function newChat() {
   const conv = { id: 'c_' + Date.now(), title: 'New Task', messages: [], createdAt: Date.now() };
-  state.conversations.unshift(conv);
-  state.currentId = conv.id;
-  state.files = [];
-  saveState();
-  renderConversations();
-  renderMessages();
+  state.conversations.unshift(conv); state.currentId = conv.id; state.files = []; saveState(); renderConversations(); renderMessages();
 }
 function getCurrentConv() { return state.conversations.find(c => c.id === state.currentId); }
-
 function renderConversations() {
   const c = document.getElementById('conversations');
   if (state.conversations.length === 0) { c.innerHTML = '<div class="empty-state">No tasks yet.</div>'; return; }
@@ -645,32 +734,49 @@ function renderConversations() {
   state.conversations.forEach(conv => {
     const el = document.createElement('div');
     el.className = 'conv-item' + (conv.id === state.currentId ? ' active' : '');
-    el.onclick = () => {
-      state.currentId = conv.id;
-      state.files = [];
-      saveState();
-      renderConversations();
-      renderMessages();
-      closeDrawers();
-    };
+    el.onclick = () => { state.currentId = conv.id; state.files = []; saveState(); renderConversations(); renderMessages(); closeDrawers(); };
     el.innerHTML = `<span class="conv-title">${escapeHtml(conv.title)}</span>`;
     c.appendChild(el);
   });
 }
-
 function clearAllChats() {
   if (confirm('Are you sure you want to delete all chat history? This cannot be undone.')) {
-    state.conversations = [];
-    state.currentId = null;
-    state.files = [];
-    saveState();
-    renderConversations();
-    renderMessages();
-    toast('success', 'History Cleared');
+    state.conversations = []; state.currentId = null; state.files = []; saveState(); renderConversations(); renderMessages(); toast('success', 'History Cleared');
   }
 }
 
-// Dedicated File Extraction Logic (Fixes disappearing files)
+// Memory Logic
+function renderMemories() {
+  const longList = document.getElementById('longTermMemList');
+  const shortList = document.getElementById('shortTermMemList');
+  
+  const createMemHTML = (mem, type) => `
+    <div class="memory-item">
+      <textarea onblur="updateMemory('${type}', '${mem.id}', this.value)">${escapeHtml(mem.text)}</textarea>
+      <div class="mem-actions">
+        <button class="action-btn" onclick="deleteMemory('${type}', '${mem.id}')" style="color: var(--danger);">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="mem-date">${new Date(mem.date).toLocaleDateString()}</div>
+    </div>
+  `;
+
+  longList.innerHTML = state.longTermMemory.map(m => createMemHTML(m, 'long')).join('') || '<div class="empty-state">No long-term memories.</div>';
+  shortList.innerHTML = state.shortTermMemory.map(m => createMemHTML(m, 'short')).join('') || '<div class="empty-state">No short-term memories.</div>';
+}
+function updateMemory(type, id, text) {
+  const arr = type === 'long' ? state.longTermMemory : state.shortTermMemory;
+  const mem = arr.find(m => m.id === id);
+  if (mem) { mem.text = text; saveState(); toast('success', 'Memory Updated'); }
+}
+function deleteMemory(type, id) {
+  if (type === 'long') state.longTermMemory = state.longTermMemory.filter(m => m.id !== id);
+  else state.shortTermMemory = state.shortTermMemory.filter(m => m.id !== id);
+  saveState(); renderMemories(); toast('success', 'Memory Deleted');
+}
+
+// File Extraction
 function extractFilesFromConv(conv) {
   if (!conv) return [];
   const files = [];
@@ -690,11 +796,9 @@ function extractFilesFromConv(conv) {
   return files;
 }
 
-// Markdown & File Extraction
 function renderMarkdown(text) {
   if (!text) return '';
   const placeholders = [];
-  // Use a local regex to replace the UI element, but don't mutate state.files here
   const fileRegex = /```file:\s*([^\n]+)\s*\n([\s\S]*?)```/g;
   let tempText = text.replace(fileRegex, (m, p1, p2) => {
     const filename = p1.trim();
@@ -708,52 +812,34 @@ function renderMarkdown(text) {
     `);
     return placeholder;
   });
-  
   let html;
   try { html = marked.parse(tempText); } catch(e) { html = `<p>${escapeHtml(text)}</p>`; }
-  
-  placeholders.forEach((p, i) => {
-    html = html.replace(`<p>[[FILE_PLACEHOLDER_${i}]]</p>`, p);
-    html = html.replace(`[[FILE_PLACEHOLDER_${i}]]`, p);
-  });
+  placeholders.forEach((p, i) => { html = html.replace(`<p>[[FILE_PLACEHOLDER_${i}]]</p>`, p); html = html.replace(`[[FILE_PLACEHOLDER_${i}]]`, p); });
   return html;
 }
 
-// Messages Rendering
 function renderMessages() {
   const area = document.getElementById('messagesArea');
   const conv = getCurrentConv();
-  
   if (!conv || conv.messages.length === 0) {
     area.innerHTML = `
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I can write code, search the web, generate PPTs, and deploy them to GitHub Pages. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I can write code, search the web, remember your preferences, and deploy files to GitHub. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
-          <div class="suggestion" onclick="useSuggestion('Write a Python script to rename all files in a directory')"><div class="suggestion-title">Write a script</div><div class="suggestion-sub">Bulk file renamer</div></div>
+          <div class="suggestion" onclick="useSuggestion('Remember that my favorite programming language is Python')"><div class="suggestion-title">Save to Memory</div><div class="suggestion-sub">Store long-term preferences</div></div>
           <div class="suggestion" onclick="useSuggestion('What is the current time in Tokyo?')"><div class="suggestion-title">Get Time</div><div class="suggestion-sub">Check current time</div></div>
         </div>
-      </div>
-    `;
-    state.files = [];
-    renderFiles();
-    return;
+      </div>`;
+    state.files = []; renderFiles(); return;
   }
-  
   area.innerHTML = '<div class="messages-inner" id="messagesInner"></div>';
   const inner = document.getElementById('messagesInner');
-  
-  // Extract files reliably before rendering messages
-  state.files = extractFilesFromConv(conv);
-  renderFiles();
-  
-  conv.messages.forEach((msg, idx) => {
-    inner.appendChild(renderMessage(msg, idx));
-  });
-  
+  state.files = extractFilesFromConv(conv); renderFiles();
+  conv.messages.forEach((msg, idx) => { inner.appendChild(renderMessage(msg, idx)); });
   setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
 }
 
@@ -761,10 +847,8 @@ function renderMessage(msg, idx) {
   const el = document.createElement('div');
   el.className = `message ${msg.role}`;
   el.dataset.idx = idx;
-  
   const avatar = msg.role === 'user' ? 'U' : 'L';
   const role = msg.role === 'user' ? 'You' : 'Agent Lumen';
-  
   let contentHtml = '';
   if (msg.role === 'user' && msg.image) {
     contentHtml = `<img src="${msg.image}" style="max-width: 200px; border-radius: 12px; margin-bottom: 8px;">`;
@@ -772,7 +856,6 @@ function renderMessage(msg, idx) {
   } else {
     contentHtml = renderMarkdown(msg.content || (msg.tool_calls ? `*🔧 Using tool: ${msg.tool_calls[0].function.name}*` : ''));
   }
-  
   el.innerHTML = `
     <div class="message-avatar">${avatar}</div>
     <div class="message-body">
@@ -786,45 +869,27 @@ function renderMessage(msg, idx) {
         ${msg.role === 'user' ? `<button class="action-btn" onclick="editMessage(${idx})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke-linecap="round" stroke-linejoin="round"/></svg> Edit</button>` : `<button class="action-btn" onclick="regenerate(${idx})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke-linecap="round" stroke-linejoin="round"/></svg> Regenerate</button>`}
         <button class="action-btn" onclick="deleteMessage(${idx})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"/></svg> Delete</button>
       </div>
-    </div>
-  `;
+    </div>`;
   return el;
 }
 
-// Workspace
 function renderFiles() {
   const list = document.getElementById('fileList');
-  if (state.files.length === 0) {
-    list.innerHTML = '<div class="empty-state">No files generated yet.</div>';
-    return;
-  }
+  if (state.files.length === 0) { list.innerHTML = '<div class="empty-state">No files generated yet.</div>'; return; }
   list.innerHTML = '';
   state.files.forEach(file => {
     const ext = file.name.split('.').pop().toLowerCase().slice(0, 4);
     const card = document.createElement('div');
     card.className = 'file-card';
     card.onclick = () => openFilePreview(file.name);
-    card.innerHTML = `
-      <div class="file-icon ext-${ext}">${ext}</div>
-      <div class="file-info">
-        <div class="file-name">${file.name}</div>
-        <div class="file-meta">${file.content.length} chars</div>
-      </div>
-    `;
+    card.innerHTML = `<div class="file-icon ext-${ext}">${ext}</div><div class="file-info"><div class="file-name">${file.name}</div><div class="file-meta">${file.content.length} chars</div></div>`;
     list.appendChild(card);
   });
 }
+function clearWorkspace() { state.files = []; renderFiles(); toast('success', 'Workspace cleared'); }
 
-function clearWorkspace() {
-  state.files = [];
-  renderFiles();
-  toast('success', 'Workspace cleared');
-}
-
-// Image Attachment
 function handleImageSelected(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+  const file = e.target.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = (ev) => {
     state.attachedImage = ev.target.result;
@@ -835,156 +900,110 @@ function handleImageSelected(e) {
   };
   reader.readAsDataURL(file);
 }
-function removeAttachedImage() {
-  state.attachedImage = null;
-  document.getElementById('imagePreviewStrip').classList.remove('visible');
-  document.getElementById('imageFileInput').value = '';
-}
+function removeAttachedImage() { state.attachedImage = null; document.getElementById('imagePreviewStrip').classList.remove('visible'); document.getElementById('imageFileInput').value = ''; }
 
-// Chat Export
 function exportChatAsMarkdown() {
   const conv = getCurrentConv();
   if (!conv || conv.messages.length === 0) return toast('error', 'No chat', 'No conversation to export');
   let md = `# ${conv.title}\n\n`;
-  conv.messages.forEach(msg => {
-    md += `**${msg.role === 'user' ? 'User' : 'Agent Lumen'}:**\n\n${msg.content}\n\n---\n\n`;
-  });
+  conv.messages.forEach(msg => { md += `**${msg.role === 'user' ? 'User' : 'Agent Lumen'}:**\n\n${msg.content}\n\n---\n\n`; });
   const blob = new Blob([md], { type: 'text/markdown' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${conv.title.replace(/\s+/g, '_')}.md`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = `${conv.title.replace(/\s+/g, '_')}.md`; a.click(); URL.revokeObjectURL(url);
   toast('success', 'Exported', 'Chat downloaded as Markdown');
 }
 
-// Preview Modal
 function openFilePreview(filename) {
-  const file = state.files.find(f => f.name === filename);
-  if (!file) return;
+  const file = state.files.find(f => f.name === filename); if (!file) return;
   state.currentPreviewFile = file;
   document.getElementById('previewTitle').textContent = file.name;
   document.getElementById('codeEditor').value = file.content;
   document.getElementById('deployUrlBox').classList.add('hidden');
-  updatePreviewIframe();
-  setPreviewMode('preview');
-  document.getElementById('previewModal').classList.add('open');
-  closeDrawers();
+  updatePreviewIframe(); setPreviewMode('preview');
+  document.getElementById('previewModal').classList.add('open'); closeDrawers();
 }
 function updatePreviewIframe() {
-  const file = state.currentPreviewFile;
-  if (!file) return;
+  const file = state.currentPreviewFile; if (!file) return;
   const frame = document.getElementById('previewFrame');
   const ext = file.name.split('.').pop().toLowerCase();
-  if (ext === 'html' || ext === 'svg') {
-    frame.srcdoc = file.content;
-  } else {
+  if (ext === 'html' || ext === 'svg') { frame.srcdoc = file.content; } 
+  else {
     const escaped = file.content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     frame.srcdoc = `<html><body style="margin:0;padding:20px;font-family:monospace;background:#1a1a1e;color:#e5e5e7;"><pre style="white-space:pre-wrap;">${escaped}</pre></body></html>`;
   }
 }
 function setPreviewMode(mode) {
-  const previewBtn = document.getElementById('togglePreviewBtn');
-  const editBtn = document.getElementById('toggleEditBtn');
-  const frame = document.getElementById('previewFrame');
-  const editor = document.getElementById('codeEditor');
-  if (mode === 'edit') {
-    previewBtn.classList.remove('active'); editBtn.classList.add('active');
-    frame.classList.add('hidden'); editor.classList.remove('hidden');
-  } else {
-    if (state.currentPreviewFile) {
-      state.currentPreviewFile.content = editor.value;
-      updatePreviewIframe(); renderFiles();
-    }
-    editBtn.classList.remove('active'); previewBtn.classList.add('active');
-    editor.classList.add('hidden'); frame.classList.remove('hidden');
+  const previewBtn = document.getElementById('togglePreviewBtn'); const editBtn = document.getElementById('toggleEditBtn');
+  const frame = document.getElementById('previewFrame'); const editor = document.getElementById('codeEditor');
+  if (mode === 'edit') { previewBtn.classList.remove('active'); editBtn.classList.add('active'); frame.classList.add('hidden'); editor.classList.remove('hidden'); } 
+  else {
+    if (state.currentPreviewFile) { state.currentPreviewFile.content = editor.value; updatePreviewIframe(); renderFiles(); }
+    editBtn.classList.remove('active'); previewBtn.classList.add('active'); editor.classList.add('hidden'); frame.classList.remove('hidden');
   }
 }
 function closePreview(e) {
   if (e && e.target.id !== 'previewModal' && !e.target.classList.contains('modal-close')) return;
   if (state.currentPreviewFile) {
     const editor = document.getElementById('codeEditor');
-    if (!editor.classList.contains('hidden')) {
-      state.currentPreviewFile.content = editor.value;
-      renderFiles();
-    }
+    if (!editor.classList.contains('hidden')) { state.currentPreviewFile.content = editor.value; renderFiles(); }
   }
-  document.getElementById('previewModal').classList.remove('open');
-  document.getElementById('previewFrame').srcdoc = '';
+  document.getElementById('previewModal').classList.remove('open'); document.getElementById('previewFrame').srcdoc = '';
 }
 
-// Robust GitHub Integration
+// GitHub Integration
 async function getOrCreateRepo() {
   if (!state.ghToken) throw new Error('GitHub Token not set. Please add it in Settings > GitHub.');
-  
   toast('info', 'GitHub', 'Checking GitHub account...');
   const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
-  if (!userRes.ok) throw new Error('Invalid GitHub Token. Please check your PAT.');
-  const user = await userRes.json();
-  state.ghUser = user.login;
+  if (!userRes.ok) throw new Error('Invalid GitHub Token.');
+  const user = await userRes.json(); state.ghUser = user.login;
 
-  const repoName = 'lumen-deploys';
-  let repoExists = false;
-  let defaultBranch = 'main';
+  const repoName = state.ghRepo || 'lumen-deploys';
+  let repoExists = false; let defaultBranch = 'main';
 
   const checkRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
-  
   if (checkRes.ok) {
     repoExists = true;
-    const repoData = await checkRes.json();
-    defaultBranch = repoData.default_branch;
+    const repoData = await checkRes.json(); defaultBranch = repoData.default_branch;
+    toast('info', 'GitHub', `Using existing repo: ${repoName}`);
   } else if (checkRes.status === 404) {
-    toast('info', 'GitHub', 'Creating lumen-deploys repository...');
+    toast('info', 'GitHub', `Creating repository: ${repoName}...`);
     const createRes = await fetch('https://api.github.com/user/repos', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: repoName, auto_init: true, description: 'Files deployed by Agent Lumen' })
     });
     if (!createRes.ok) throw new Error('Failed to create GitHub repo');
-    const newRepoData = await createRes.json();
-    defaultBranch = newRepoData.default_branch || 'main';
-    
-    // Wait for repo to be fully initialized on GitHub's backend
+    const newRepoData = await createRes.json(); defaultBranch = newRepoData.default_branch || 'main';
     await new Promise(r => setTimeout(r, 3000));
-  } else {
-    throw new Error('Failed to check GitHub repo');
-  }
+  } else { throw new Error('Failed to check GitHub repo'); }
 
-  // Check and Enable Pages
-  toast('info', 'GitHub', 'Enabling GitHub Pages...');
+  // Enable Pages
   const pagesCheckRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
-  
   if (pagesCheckRes.status === 404) {
-    const pagesRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, {
+    toast('info', 'GitHub', 'Enabling GitHub Pages...');
+    await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ source: { branch: defaultBranch, path: '/' } })
     });
-    // We ignore the response body, because even if it fails, the file push will still work 
-    // and GitHub Pages might just need a manual toggle in rare cases.
   }
   
   saveState();
-  return defaultBranch;
+  return { repoName, defaultBranch };
 }
 
 async function deployToGitHub(filename, content) {
-  const defaultBranch = await getOrCreateRepo();
-  
+  const { repoName, defaultBranch } = await getOrCreateRepo();
   const timestamp = new Date().getTime();
   const safeName = filename.replace(/[^a-zA-Z0-9.]/g, '_');
   const path = `uploads/${timestamp}_${safeName}`;
   const encodedContent = btoa(unescape(encodeURIComponent(content)));
   
-  const url = `https://api.github.com/repos/${state.ghUser}/lumen-deploys/contents/${path}`;
+  const url = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/${path}`;
   const res = await fetch(url, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${state.ghToken}`,
-      'Accept': 'application/vnd.github+json',
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: `Deploy ${filename} via Lumen`, content: encodedContent, branch: defaultBranch })
   });
 
@@ -993,51 +1012,55 @@ async function deployToGitHub(filename, content) {
     throw new Error(errData.message || `GitHub API Error: ${res.status}`);
   }
 
-  return `https://${state.ghUser}.github.io/lumen-deploys/${path}`;
+  // Auto-Generate README
+  if (state.ghWriteReadme) {
+    try {
+      const readmePath = `README.md`;
+      const readmeUrl = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/${readmePath}`;
+      let sha = null;
+      const checkReadme = await fetch(readmeUrl, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
+      if (checkReadme.ok) { const data = await checkReadme.json(); sha = data.sha; }
+      
+      const readmeContent = `# ${repoName}\n\nThis repository contains files deployed by Agent Lumen.\n\n## Latest Deployments\n\n- [${filename}](uploads/${timestamp}_${safeName}) - Deployed on ${new Date(timestamp).toLocaleString()}\n`;
+      const encodedReadme = btoa(unescape(encodeURIComponent(readmeContent)));
+      
+      await fetch(readmeUrl, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: `Update README via Lumen`, content: encodedReadme, sha, branch: defaultBranch })
+      });
+    } catch (err) { console.error("Failed to update README:", err); }
+  }
+
+  return `https://${state.ghUser}.github.io/${repoName}/${path}`;
 }
 
 async function deployCurrentFile() {
   if (!state.currentPreviewFile) return;
   if (!state.ghToken) { toast('error', 'Missing Token', 'Add GitHub PAT in Settings'); return; }
-  
   const editor = document.getElementById('codeEditor');
-  if (!editor.classList.contains('hidden')) {
-    state.currentPreviewFile.content = editor.value;
-    updatePreviewIframe(); renderFiles();
-  }
-
-  const file = state.currentPreviewFile;
-  const deployBtn = document.getElementById('deployBtn');
-  const urlBox = document.getElementById('deployUrlBox');
-  
+  if (!editor.classList.contains('hidden')) { state.currentPreviewFile.content = editor.value; updatePreviewIframe(); renderFiles(); }
+  const file = state.currentPreviewFile; const deployBtn = document.getElementById('deployBtn'); const urlBox = document.getElementById('deployUrlBox');
   deployBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:black;border-radius:50%;animation:spin 0.7s linear infinite;"></div> Deploying...';
   deployBtn.disabled = true;
-  
   try {
     const liveUrl = await deployToGitHub(file.name, file.content);
-    urlBox.textContent = liveUrl;
-    urlBox.classList.remove('hidden');
+    urlBox.textContent = liveUrl; urlBox.classList.remove('hidden');
     toast('success', 'Deployed!', 'File is live on GitHub Pages.');
-  } catch (err) {
-    toast('error', 'Deploy failed', err.message);
-  } finally {
-    deployBtn.innerHTML = 'Deploy to GitHub';
-    deployBtn.disabled = false;
-  }
+  } catch (err) { toast('error', 'Deploy failed', err.message); } 
+  finally { deployBtn.innerHTML = 'Deploy to GitHub'; deployBtn.disabled = false; }
 }
 
 async function exportChatsToGithub() {
   if (!state.ghToken) return toast('error', 'Missing Token', 'Add GitHub PAT in Settings');
   toast('info', 'Syncing...', 'Uploading chat history to GitHub');
   try {
-    const defaultBranch = await getOrCreateRepo();
+    const { repoName, defaultBranch } = await getOrCreateRepo();
     const path = `lumen_data/chats.json`;
-    const url = `https://api.github.com/repos/${state.ghUser}/lumen-deploys/contents/${path}`;
-    
+    const url = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/${path}`;
     let sha = null;
     const checkRes = await fetch(url, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
     if (checkRes.ok) { const data = await checkRes.json(); sha = data.sha; }
-
     const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(state.conversations, null, 2))));
     const res = await fetch(url, {
       method: 'PUT',
@@ -1046,36 +1069,25 @@ async function exportChatsToGithub() {
     });
     if (!res.ok) throw new Error('Failed to sync');
     toast('success', 'Sync Complete', 'Chat history backed up');
-  } catch (err) {
-    toast('error', 'Sync Failed', err.message);
-  }
+  } catch (err) { toast('error', 'Sync Failed', err.message); }
 }
 
 async function importChatsFromGithub() {
   if (!state.ghToken) return toast('error', 'Missing Token', 'Add GitHub PAT in Settings');
   toast('info', 'Loading...', 'Fetching chat history');
   try {
-    await getOrCreateRepo();
-    const url = `https://api.github.com/repos/${state.ghUser}/lumen-deploys/contents/lumen_data/chats.json`;
+    const { repoName } = await getOrCreateRepo();
+    const url = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/lumen_data/chats.json`;
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
     if (!res.ok) throw new Error('No backup found');
-    
     const data = await res.json();
     const decodedContent = decodeURIComponent(escape(atob(data.content)));
-    state.conversations = JSON.parse(decodedContent);
-    saveState();
-    renderConversations();
-    renderMessages();
+    state.conversations = JSON.parse(decodedContent); saveState(); renderConversations(); renderMessages();
     toast('success', 'Restore Complete', 'Chat history loaded');
-  } catch (err) {
-    toast('error', 'Restore Failed', err.message);
-  }
+  } catch (err) { toast('error', 'Restore Failed', err.message); }
 }
 
-function copyDeployUrl() {
-  navigator.clipboard.writeText(document.getElementById('deployUrlBox').textContent);
-  toast('success', 'Copied', 'URL copied to clipboard');
-}
+function copyDeployUrl() { navigator.clipboard.writeText(document.getElementById('deployUrlBox').textContent); toast('success', 'Copied', 'URL copied to clipboard'); }
 
 // Tool Execution
 async function executeTool(toolCall) {
@@ -1083,22 +1095,23 @@ async function executeTool(toolCall) {
   let result = '';
   if (toolCall.function.name === 'search_wikipedia') {
     const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(args.query)}&format=json&origin=*`);
-    const data = await res.json();
-    result = JSON.stringify(data.query.search.slice(0, 3));
+    const data = await res.json(); result = JSON.stringify(data.query.search.slice(0, 3));
   } else if (toolCall.function.name === 'fetch_webpage') {
-    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(args.url)}`);
-    result = await res.text();
+    const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(args.url)}`); result = await res.text();
   } else if (toolCall.function.name === 'get_current_time') {
     result = new Date().toString();
+  } else if (toolCall.function.name === 'save_memory') {
+    const mem = { id: 'm_' + Date.now(), text: args.content, date: Date.now() };
+    if (args.type === 'long') state.longTermMemory.push(mem);
+    else state.shortTermMemory.push(mem);
+    saveState(); renderMemories();
+    result = JSON.stringify({ success: true, message: `Saved to ${args.type} term memory.` });
   } else if (toolCall.function.name === 'deploy_to_web') {
     try {
       const liveUrl = await deployToGitHub(args.filename, args.content);
       result = JSON.stringify({ success: true, url: liveUrl });
-      state.files.push({ name: args.filename, content: args.content });
-      renderFiles();
-    } catch (err) {
-      result = JSON.stringify({ success: false, error: err.message });
-    }
+      state.files.push({ name: args.filename, content: args.content }); renderFiles();
+    } catch (err) { result = JSON.stringify({ success: false, error: err.message }); }
   }
   return result;
 }
@@ -1107,15 +1120,9 @@ async function executeTool(toolCall) {
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; }
 function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey && state.sendOnEnter) { e.preventDefault(); sendMessage(); } }
 function useSuggestion(text) { const i = document.getElementById('messageInput'); i.value = text; autoResize(i); i.focus(); }
-function copyMessage(idx) {
-  const conv = getCurrentConv();
-  const msg = conv.messages[idx];
-  navigator.clipboard.writeText(msg.content || '');
-  toast('success', 'Copied', 'Message copied to clipboard');
-}
+function copyMessage(idx) { const conv = getCurrentConv(); const msg = conv.messages[idx]; navigator.clipboard.writeText(msg.content || ''); toast('success', 'Copied', 'Message copied to clipboard'); }
 function toggleVoiceInput() {
-  const micBtn = document.getElementById('micBtn');
-  const input = document.getElementById('messageInput');
+  const micBtn = document.getElementById('micBtn'); const input = document.getElementById('messageInput');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return toast('error', 'Not supported', 'Browser does not support voice input');
   if (recognition && recognition.isStarted) { recognition.stop(); micBtn.classList.remove('recording'); return; }
@@ -1128,65 +1135,43 @@ function toggleVoiceInput() {
       if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
       else interimTranscript += event.results[i][0].transcript;
     }
-    input.value = finalTranscript + interimTranscript;
-    autoResize(input);
+    input.value = finalTranscript + interimTranscript; autoResize(input);
   };
   recognition.onerror = (event) => { toast('error', 'Voice Error', event.error); micBtn.classList.remove('recording'); };
   recognition.onend = () => { micBtn.classList.remove('recording'); recognition.isStarted = false; };
   recognition.start(); recognition.isStarted = true; micBtn.classList.add('recording');
 }
-
 function editMessage(idx) {
-  const conv = getCurrentConv();
-  if (!conv) return;
-  const textToEdit = conv.messages[idx].content;
-  conv.messages = conv.messages.slice(0, idx);
-  saveState(); renderMessages();
-  const input = document.getElementById('messageInput');
-  input.value = textToEdit; autoResize(input); input.focus();
+  const conv = getCurrentConv(); if (!conv) return;
+  const textToEdit = conv.messages[idx].content; conv.messages = conv.messages.slice(0, idx); saveState(); renderMessages();
+  const input = document.getElementById('messageInput'); input.value = textToEdit; autoResize(input); input.focus();
 }
-
 async function regenerate(idx) {
-  const conv = getCurrentConv();
-  if (!conv) return;
-  conv.messages = conv.messages.slice(0, idx);
-  saveState(); renderMessages();
-  await generateResponse();
+  const conv = getCurrentConv(); if (!conv) return;
+  conv.messages = conv.messages.slice(0, idx); saveState(); renderMessages(); await generateResponse();
 }
-
 function deleteMessage(idx) {
-  const conv = getCurrentConv();
-  if (!conv) return;
-  conv.messages.splice(idx, 1);
-  saveState(); renderMessages();
-  toast('success', 'Deleted', 'Message removed');
+  const conv = getCurrentConv(); if (!conv) return;
+  conv.messages.splice(idx, 1); saveState(); renderMessages(); toast('success', 'Deleted', 'Message removed');
 }
 
 async function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
+  const input = document.getElementById('messageInput'); const text = input.value.trim();
   if (!text && !state.attachedImage) return;
   if (!state.endpoint || !state.apiKey) { toast('error', 'Not configured', 'Set API endpoint in Settings'); openSettings(); return; }
   if (!state.selectedModel) { toast('error', 'No model', 'Select a model in Settings'); openSettings('models'); return; }
-
-  let conv = getCurrentConv();
-  if (!conv) { newChat(); conv = getCurrentConv(); }
-
+  let conv = getCurrentConv(); if (!conv) { newChat(); conv = getCurrentConv(); }
   conv.messages.push({ role: 'user', content: text, image: state.attachedImage, timestamp: Date.now() });
   if (conv.messages.length === 1) conv.title = text.slice(0, 40);
-  
-  input.value = ''; autoResize(input); removeAttachedImage();
-  saveState(); renderConversations(); renderMessages();
+  input.value = ''; autoResize(input); removeAttachedImage(); saveState(); renderConversations(); renderMessages();
   await generateResponse();
 }
 
 async function generateResponse() {
-  const conv = getCurrentConv();
-  if (!conv) return;
+  const conv = getCurrentConv(); if (!conv) return;
   isStreaming = true; updateSendButton();
   conv.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
-  const msgIdx = conv.messages.length - 1;
-  renderMessages();
+  const msgIdx = conv.messages.length - 1; renderMessages();
   document.querySelector(`.message[data-idx="${msgIdx}"] .message-content`).innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
   abortController = new AbortController();
   
@@ -1194,31 +1179,28 @@ async function generateResponse() {
     let history = conv.messages.filter((m, i) => i < msgIdx).map(m => {
       if (m.role === 'tool') return { role: 'tool', tool_call_id: m.tool_call_id, content: m.content };
       if (m.tool_calls) return { role: 'assistant', content: m.content || null, tool_calls: m.tool_calls };
-      if (m.role === 'user' && m.image) {
-        return { role: 'user', content: [ { type: 'text', text: m.content || 'What is in this image?' }, { type: 'image_url', image_url: { url: m.image } } ] };
-      }
+      if (m.role === 'user' && m.image) return { role: 'user', content: [ { type: 'text', text: m.content || 'What is in this image?' }, { type: 'image_url', image_url: { url: m.image } } ] };
       return { role: m.role, content: m.content };
     });
     if (state.contextLimit > 0 && history.length > state.contextLimit) history = history.slice(-state.contextLimit);
     
-    const messages = [ { role: 'system', content: state.systemPrompt }, ...history ];
+    // Build Dynamic System Prompt with Memory
+    let dynamicPrompt = state.systemPrompt + "\n\n### LONG-TERM MEMORY ###\n" + (state.longTermMemory.map(m => `- ${m.text}`).join('\n') || 'No long-term memories saved.') + "\n\n### SHORT-TERM MEMORY ###\n" + (state.shortTermMemory.map(m => `- ${m.text}`).join('\n') || 'No short-term memories saved.');
+    
+    const messages = [ { role: 'system', content: dynamicPrompt }, ...history ];
     const bodyPayload = {
       model: state.selectedModel, messages, stream: state.stream,
       temperature: state.temperature, max_tokens: state.maxTokens,
       top_p: state.topP, frequency_penalty: state.freqPenalty, presence_penalty: state.presPenalty
     };
 
-    // Add Tools
     let tools = [];
     if (state.tools.search) tools.push({ type: "function", function: { name: "search_wikipedia", description: "Search Wikipedia for information", parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] } } });
     if (state.tools.fetch) tools.push({ type: "function", function: { name: "fetch_webpage", description: "Fetch the content of a webpage", parameters: { type: "object", properties: { url: { type: "string" } }, required: ["url"] } } });
     if (state.tools.time) tools.push({ type: "function", function: { name: "get_current_time", description: "Get the current local time", parameters: { type: "object", properties: {} } } });
+    if (state.tools.memory) tools.push({ type: "function", function: { name: "save_memory", description: "Save a piece of information to long-term or short-term memory.", parameters: { type: "object", properties: { type: { type: "string", enum: ["long", "short"] }, content: { type: "string" } }, required: ["type", "content"] } } });
     if (state.tools.deploy) tools.push({ type: "function", function: { name: "deploy_to_web", description: "Upload a file to the public web via GitHub Pages", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" } }, required: ["filename", "content"] } } });
-    
-    if (tools.length > 0) {
-      bodyPayload.tools = tools;
-      bodyPayload.tool_choice = "auto";
-    }
+    if (tools.length > 0) { bodyPayload.tools = tools; bodyPayload.tool_choice = "auto"; }
     
     const res = await fetch(state.endpoint.replace(/\/$/, '') + '/chat/completions', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
@@ -1226,33 +1208,20 @@ async function generateResponse() {
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    
-    let fullContent = '';
-    let toolCalls = {}; 
+    let fullContent = ''; let toolCalls = {}; 
     
     if (state.stream && res.body) {
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
+      const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const { done, value } = await reader.read(); if (done) break;
+        buffer += decoder.decode(value, { stream: true }); const lines = buffer.split('\n'); buffer = lines.pop() || '';
         for (const line of lines) {
           if (!line.startsWith('data:')) continue;
-          const data = line.slice(5).trim();
-          if (data === '[DONE]') continue;
+          const data = line.slice(5).trim(); if (data === '[DONE]') continue;
           try {
-            const json = JSON.parse(data);
-            const delta = json.choices?.[0]?.delta;
+            const json = JSON.parse(data); const delta = json.choices?.[0]?.delta;
             if (delta) {
-              if (delta.content) {
-                fullContent += delta.content;
-                conv.messages[msgIdx].content = fullContent;
-                updateMessageContent(msgIdx, fullContent);
-              }
+              if (delta.content) { fullContent += delta.content; conv.messages[msgIdx].content = fullContent; updateMessageContent(msgIdx, fullContent); }
               if (delta.tool_calls) {
                 delta.tool_calls.forEach(tc => {
                   if (!toolCalls[tc.index]) toolCalls[tc.index] = { id: tc.id, name: '', arguments: '' };
@@ -1266,79 +1235,47 @@ async function generateResponse() {
         }
       }
     } else {
-      const data = await res.json();
-      const msg = data.choices?.[0]?.message;
+      const data = await res.json(); const msg = data.choices?.[0]?.message;
       if (msg) {
-        fullContent = msg.content || '';
-        conv.messages[msgIdx].content = fullContent;
-        if (msg.tool_calls) {
-          msg.tool_calls.forEach((tc, i) => {
-            toolCalls[i] = { id: tc.id, name: tc.function.name, arguments: tc.function.arguments };
-          });
-        }
+        fullContent = msg.content || ''; conv.messages[msgIdx].content = fullContent;
+        if (msg.tool_calls) { msg.tool_calls.forEach((tc, i) => { toolCalls[i] = { id: tc.id, name: tc.function.name, arguments: tc.function.arguments }; }); }
       }
     }
     
-    // Handle Tool Calls
     if (Object.keys(toolCalls).length > 0) {
-      let toolCallsArray = Object.keys(toolCalls).map(k => ({
-        id: toolCalls[k].id, type: 'function',
-        function: { name: toolCalls[k].name, arguments: toolCalls[k].arguments }
-      }));
-      
-      // Update assistant message and execute tools
-      conv.messages[msgIdx].content = fullContent || '';
-      conv.messages[msgIdx].tool_calls = toolCallsArray;
-      
+      let toolCallsArray = Object.keys(toolCalls).map(k => ({ id: toolCalls[k].id, type: 'function', function: { name: toolCalls[k].name, arguments: toolCalls[k].arguments } }));
+      conv.messages[msgIdx].content = fullContent || ''; conv.messages[msgIdx].tool_calls = toolCallsArray;
       for (let tc of toolCallsArray) {
         try {
           updateMessageContent(msgIdx, `🔧 Using tool: ${tc.function.name}...`);
           let toolResult = await executeTool(tc);
           conv.messages.push({ role: 'tool', tool_call_id: tc.id, content: toolResult });
-        } catch (err) {
-          conv.messages.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify({ error: err.message }) });
-        }
+        } catch (err) { conv.messages.push({ role: 'tool', tool_call_id: tc.id, content: JSON.stringify({ error: err.message }) }); }
       }
-      
-      // Second API call to process tool results
       updateMessageContent(msgIdx, `⏳ Processing results...`);
-      const bodyPayload2 = { ...bodyPayload, stream: false, messages: [
-        { role: 'system', content: state.systemPrompt },
-        ...conv.messages.filter((m, i) => i !== msgIdx)
-      ]};
-      
+      const bodyPayload2 = { ...bodyPayload, stream: false, messages: [ { role: 'system', content: dynamicPrompt }, ...conv.messages.filter((m, i) => i !== msgIdx) ]};
       const res2 = await fetch(state.endpoint.replace(/\/$/, '') + '/chat/completions', {
         method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.apiKey}` },
         body: JSON.stringify(bodyPayload2)
       });
-      
       if (res2.ok) {
         const data2 = await res2.json();
         fullContent = data2.choices?.[0]?.message?.content || '';
-        conv.messages[msgIdx].content = fullContent;
-        conv.messages[msgIdx].tool_calls = undefined;
+        conv.messages[msgIdx].content = fullContent; conv.messages[msgIdx].tool_calls = undefined;
         updateMessageContent(msgIdx, fullContent);
       }
     }
-    
-    saveState();
-    renderMessages(); 
-    toast('success', 'Task complete');
+    saveState(); renderMessages(); toast('success', 'Task complete');
   } catch (err) {
     if (err.name === 'AbortError') toast('info', 'Stopped');
     else { console.error(err); toast('error', 'Failed', err.message); conv.messages[msgIdx].content = `Error: ${err.message}`; renderMessages(); }
-  } finally {
-    isStreaming = false; updateSendButton(); saveState();
-  }
+  } finally { isStreaming = false; updateSendButton(); saveState(); }
 }
 
 function updateMessageContent(idx, content) {
   const area = document.getElementById('messagesArea');
   const msgEl = area.querySelector(`.message[data-idx="${idx}"] .message-content`);
-  if (msgEl) {
-    msgEl.innerHTML = renderMarkdown(content);
-    area.scrollTop = area.scrollHeight;
-  }
+  if (msgEl) { msgEl.innerHTML = renderMarkdown(content); area.scrollTop = area.scrollHeight; }
 }
 
 function updateSendButton() {
@@ -1359,17 +1296,12 @@ function openSettings(tab = 'connection') {
   document.getElementById('endpointInput').value = state.endpoint;
   document.getElementById('apiKeyInput').value = state.apiKey;
   document.getElementById('systemPromptInput').value = state.systemPrompt;
-  document.getElementById('tempInput').value = state.temperature;
-  document.getElementById('tempValue').innerText = state.temperature;
-  document.getElementById('topPInput').value = state.topP;
-  document.getElementById('topPValue').innerText = state.topP;
-  document.getElementById('freqPenaltyInput').value = state.freqPenalty;
-  document.getElementById('freqPenaltyValue').innerText = state.freqPenalty;
-  document.getElementById('presPenaltyInput').value = state.presPenalty;
-  document.getElementById('presPenaltyValue').innerText = state.presPenalty;
-  document.getElementById('maxTokensInput').value = state.maxTokens;
-  document.getElementById('contextLimitInput').value = state.contextLimit;
-  document.getElementById('ghTokenInput').value = state.ghToken;
+  document.getElementById('tempInput').value = state.temperature; document.getElementById('tempValue').innerText = state.temperature;
+  document.getElementById('topPInput').value = state.topP; document.getElementById('topPValue').innerText = state.topP;
+  document.getElementById('freqPenaltyInput').value = state.freqPenalty; document.getElementById('freqPenaltyValue').innerText = state.freqPenalty;
+  document.getElementById('presPenaltyInput').value = state.presPenalty; document.getElementById('presPenaltyValue').innerText = state.presPenalty;
+  document.getElementById('maxTokensInput').value = state.maxTokens; document.getElementById('contextLimitInput').value = state.contextLimit;
+  document.getElementById('ghTokenInput').value = state.ghToken; document.getElementById('ghRepoInput').value = state.ghRepo;
   
   document.getElementById('darkSwitch').classList.toggle('on', state.theme === 'dark');
   document.getElementById('streamSwitch').classList.toggle('on', state.stream);
@@ -1377,14 +1309,13 @@ function openSettings(tab = 'connection') {
   document.getElementById('searchSwitch').classList.toggle('on', state.tools.search);
   document.getElementById('fetchSwitch').classList.toggle('on', state.tools.fetch);
   document.getElementById('timeSwitch').classList.toggle('on', state.tools.time);
+  document.getElementById('memorySwitch').classList.toggle('on', state.tools.memory);
   document.getElementById('deploySwitch').classList.toggle('on', state.tools.deploy);
+  document.getElementById('ghReadmeSwitch').classList.toggle('on', state.ghWriteReadme);
   
-  switchTab(tab);
-  renderModelList();
-  document.getElementById('settingsModal').classList.add('open');
-  closeDrawers();
+  switchTab(tab); renderModelList(); renderMemories();
+  document.getElementById('settingsModal').classList.add('open'); closeDrawers();
 }
-
 function closeSettings() {
   state.temperature = parseFloat(document.getElementById('tempInput').value);
   state.topP = parseFloat(document.getElementById('topPInput').value);
@@ -1392,51 +1323,37 @@ function closeSettings() {
   state.presPenalty = parseFloat(document.getElementById('presPenaltyInput').value);
   state.maxTokens = parseInt(document.getElementById('maxTokensInput').value);
   state.contextLimit = parseInt(document.getElementById('contextLimitInput').value);
-  saveState();
-  document.getElementById('settingsModal').classList.remove('open');
+  saveState(); document.getElementById('settingsModal').classList.remove('open');
 }
-
 function switchTab(tab) {
   document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
   document.getElementById('panel-' + tab).classList.remove('hidden');
 }
-
 function applyPreset(type) {
   if (type === 'agent') state.systemPrompt = DEFAULT_AGENT_PROMPT;
   else if (type === 'standard') state.systemPrompt = 'You are a helpful AI assistant.';
-  document.getElementById('systemPromptInput').value = state.systemPrompt;
-  saveState();
-  toast('success', 'Preset applied');
+  document.getElementById('systemPromptInput').value = state.systemPrompt; saveState(); toast('success', 'Preset applied');
 }
-
-function savePersona() {
-  state.systemPrompt = document.getElementById('systemPromptInput').value;
-  saveState();
-  toast('success', 'Persona saved');
-  closeSettings();
-}
-
+function savePersona() { state.systemPrompt = document.getElementById('systemPromptInput').value; saveState(); toast('success', 'Persona saved'); closeSettings(); }
 function toggleStream() { state.stream = !state.stream; document.getElementById('streamSwitch').classList.toggle('on', state.stream); saveState(); }
 function toggleEnter() { state.sendOnEnter = !state.sendOnEnter; document.getElementById('enterSwitch').classList.toggle('on', state.sendOnEnter); saveState(); }
+function toggleGhReadme() { state.ghWriteReadme = !state.ghWriteReadme; document.getElementById('ghReadmeSwitch').classList.toggle('on', state.ghWriteReadme); saveState(); }
 
 function toggleToolSetting(tool) {
   state.tools[tool] = !state.tools[tool];
   document.getElementById(tool + 'Switch').classList.toggle('on', state.tools[tool]);
-  saveState();
-  toast('info', 'Tool Updated', `${tool} ${state.tools[tool] ? 'enabled' : 'disabled'}`);
+  saveState(); toast('info', 'Tool Updated', `${tool} ${state.tools[tool] ? 'enabled' : 'disabled'}`);
 }
 
 function saveGithubSettings() {
   state.ghToken = document.getElementById('ghTokenInput').value.trim();
-  saveState();
-  toast('success', 'GitHub Token Saved');
-  closeSettings();
+  state.ghRepo = document.getElementById('ghRepoInput').value.trim() || 'lumen-deploys';
+  saveState(); toast('success', 'GitHub Settings Saved'); closeSettings();
 }
 
 async function testConnection() {
-  const ep = document.getElementById('endpointInput').value.trim();
-  const key = document.getElementById('apiKeyInput').value.trim();
+  const ep = document.getElementById('endpointInput').value.trim(); const key = document.getElementById('apiKeyInput').value.trim();
   if (!ep) return toast('error', 'Missing endpoint');
   try {
     const res = await fetch(ep.replace(/\/$/, '') + '/models', { headers: { 'Authorization': `Bearer ${key}` } });
@@ -1445,11 +1362,8 @@ async function testConnection() {
     const models = (data.data || data.models || data || []).map(m => ({ id: m.id || m.name, name: m.id || m.name }));
     state.models = models; state.endpoint = ep; state.apiKey = key;
     if (!state.selectedModel && models.length > 0) state.selectedModel = models[0].id;
-    saveState(); renderModelList(); updateModelPill();
-    toast('success', 'Connected', `Found ${models.length} models`);
-  } catch (err) {
-    toast('error', 'Connection failed', err.message);
-  }
+    saveState(); renderModelList(); updateModelPill(); toast('success', 'Connected', `Found ${models.length} models`);
+  } catch (err) { toast('error', 'Connection failed', err.message); }
 }
 
 function renderModelList() {
@@ -1459,17 +1373,9 @@ function renderModelList() {
   state.models.forEach(m => {
     const item = document.createElement('div');
     item.style.cssText = 'padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;';
-    if (m.id === state.selectedModel) {
-      item.style.background = 'var(--accent-soft)';
-      item.style.color = 'var(--accent)';
-      item.style.fontWeight = '600';
-    }
-    item.onclick = () => { 
-      state.selectedModel = m.id; saveState(); renderModelList(); updateModelPill(); closeSettings(); 
-      toast('success', 'Model selected', m.name); 
-    };
-    item.textContent = m.name;
-    list.appendChild(item);
+    if (m.id === state.selectedModel) { item.style.background = 'var(--accent-soft)'; item.style.color = 'var(--accent)'; item.style.fontWeight = '600'; }
+    item.onclick = () => { state.selectedModel = m.id; saveState(); renderModelList(); updateModelPill(); closeSettings(); toast('success', 'Model selected', m.name); };
+    item.textContent = m.name; list.appendChild(item);
   });
 }
 
@@ -1480,10 +1386,7 @@ function updateModelPill() {
 }
 
 // Init
-applyTheme();
-renderConversations();
-renderMessages();
-updateModelPill();
+applyTheme(); renderConversations(); renderMessages(); updateModelPill();
 </script>
 </body>
 </html>
