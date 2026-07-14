@@ -54,12 +54,19 @@
   .logo-text { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; } .logo-text span { color: var(--text-secondary); font-weight: 500; }
   .new-chat-btn { width: 100%; padding: 11px 14px; background: var(--accent); color: white; border: none; border-radius: var(--radius-md); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.2); }
   .new-chat-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+  .search-wrapper { position: relative; margin-bottom: 8px; }
+  .search-input { width: 100%; padding: 8px 12px 8px 34px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: inherit; font-size: 13px; outline: none; transition: all 0.15s; }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); width: 16px; height: 16px; pointer-events: none; }
   .conversations { flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 8px 12px; -webkit-overflow-scrolling: touch; }
   .conversations::-webkit-scrollbar { width: 6px; } .conversations::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
   .conv-section-label { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; padding: 12px 8px 6px; }
   .conv-item { padding: 10px 12px; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 2px; transition: background 0.15s; color: var(--text-secondary); font-size: 14px; }
   .conv-item:hover { background: var(--surface-hover); color: var(--text); } .conv-item.active { background: var(--surface-active); color: var(--text); }
   .conv-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+  .conv-delete { opacity: 0; background: none; border: none; color: var(--text-tertiary); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.15s; display: flex; }
+  .conv-item:hover .conv-delete { opacity: 1; }
+  .conv-delete:hover { color: var(--danger); background: rgba(255, 69, 58, 0.1); }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); font-size: 13px; }
   .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
   .footer-btn { width: 100%; padding: 10px 12px; background: transparent; border: none; border-radius: var(--radius-sm); color: var(--text-secondary); font-family: inherit; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.15s; }
@@ -109,6 +116,9 @@
   .message-content pre { background: #1a1a1e; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; overflow-x: auto; margin: 12px 0; position: relative; }
   .message-content pre code { background: none; padding: 0; font-size: 13px; color: #e5e5e7; font-family: 'JetBrains Mono', monospace; }
   .message-content code { font-family: 'JetBrains Mono', monospace; font-size: 13px; background: var(--surface-active); padding: 2px 6px; border-radius: 5px; }
+  .code-block-wrapper { position: relative; }
+  .code-copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; font-size: 11px; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+  .code-block-wrapper:hover .code-copy-btn { opacity: 1; }
   .action-btn { padding: 5px 8px; background: transparent; border: none; border-radius: 6px; color: var(--text-tertiary); font-family: inherit; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
   .action-btn:hover { background: var(--surface-hover); color: var(--text); }
   .typing { display: flex; gap: 4px; padding: 8px 0; }
@@ -131,6 +141,11 @@
   .image-preview-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); }
   .image-preview-info { flex: 1; min-width: 0; font-size: 12px; }
   .image-preview-remove { background: none; border: none; color: var(--text-tertiary); cursor: pointer; padding: 4px; border-radius: 6px; }
+  .skill-menu { position: absolute; bottom: 100%; left: 0; right: 0; background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); margin-bottom: 8px; padding: 8px; display: none; z-index: 10; max-height: 240px; overflow-y: auto; }
+  .skill-menu.open { display: block; }
+  .skill-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text); font-size: 14px; }
+  .skill-item:hover { background: var(--surface-hover); }
+  .skill-item svg { width: 18px; height: 18px; color: var(--accent); }
   .input-wrapper { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 8px 8px 8px 18px; display: flex; align-items: flex-end; gap: 8px; transition: all 0.2s ease; box-shadow: var(--shadow-md); }
   .input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow-md); }
   textarea.input { flex: 1; background: transparent; border: none; outline: none; color: var(--text); font-family: inherit; font-size: 15px; line-height: 1.5; resize: none; padding: 8px 0; max-height: 200px; min-height: 24px; }
@@ -173,24 +188,23 @@
   .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1); box-shadow: var(--shadow-sm); }
   .switch.on { background: var(--accent); }
   .switch.on::after { transform: translateX(18px); }
-
-  /* Memory & Integration Specifics */
   .memory-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px; }
   .memory-item textarea { flex: 1; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 13px; resize: vertical; min-height: 30px; outline: none; }
   .memory-item .mem-actions { display: flex; flex-direction: column; gap: 5px; }
   .memory-item .mem-date { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
   .integration-card { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); margin-bottom: 10px; text-decoration: none; color: var(--text); transition: all 0.2s; }
-  .integration-card:hover { background: var(--surface-hover); border-color: var(--accent); }
+  .integration-card:hover { background: var(--surface-hover); border-color: var(--border-strong); transform: translateY(-1px); }
   .integration-logo { width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; flex-shrink: 0; }
   .integration-info { flex: 1; }
   .integration-name { font-weight: 600; font-size: 14px; }
   .integration-desc { font-size: 12px; color: var(--text-secondary); }
+  .integration-status { font-size: 11px; padding: 4px 8px; border-radius: 4px; background: var(--surface-active); color: var(--text-secondary); }
 
   /* Toasts */
   .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 100%; max-width: 420px; padding: 0 16px; box-sizing: border-box; }
   .toast { background: var(--bg-elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 12px 16px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-lg); backdrop-filter: blur(40px); pointer-events: auto; animation: toastIn 0.4s cubic-bezier(0.32, 0.72, 0, 1); font-size: 14px; }
   .toast.exit { animation: toastOut 0.3s ease forwards; }
-  @keyframes toastIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); }
   @keyframes toastOut { to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
   .toast-icon { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; flex-shrink: 0; color: white; background: var(--accent); }
   .toast.success .toast-icon { background: var(--success); } .toast.error .toast-icon { background: var(--danger); }
@@ -212,6 +226,8 @@
   .preview-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 12px; align-items: center; background: var(--bg-elevated); flex-shrink: 0; }
   .deploy-btn { background: var(--success); color: black; font-weight: 700; }
   .deploy-url-box { flex: 1; background: var(--surface); border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; font-size: 13px; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  #inlineRepoInput { width: 160px; flex-shrink: 0; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 13px; outline: none; }
+  #inlineRepoInput:focus { border-color: var(--accent); }
 
   .hidden { display: none !important; }
 
@@ -228,7 +244,7 @@
     textarea.input { font-size: 16px; }
     .modal { width: 100%; max-width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
     .modal-header { padding-top: calc(env(safe-area-inset-top, 0px) + 22px); }
-    .preview-footer { flex-direction: column; } .deploy-url-box { width: 100%; }
+    .preview-footer { flex-direction: column; } .deploy-url-box { width: 100%; } #inlineRepoInput { width: 100%; }
   }
 </style>
 </head>
@@ -244,6 +260,10 @@
         <div class="logo-text">Lumen<span> · assistant</span></div>
       </div>
       <button class="new-chat-btn" onclick="newChat(); closeDrawers();">New Task</button>
+      <div class="search-wrapper" style="margin-top: 12px;">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search chats..." oninput="renderConversations()">
+      </div>
     </div>
     <div class="conversations" id="conversations">
       <div class="empty-state">No tasks yet.<br>Start a new task to begin.</div>
@@ -281,11 +301,11 @@
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I can write code, search the web, remember your preferences, and deploy files to GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
-          <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
+          <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
-          <div class="suggestion" onclick="useSuggestion('Remember that my favorite programming language is Python')"><div class="suggestion-title">Save to Memory</div><div class="suggestion-sub">Store long-term preferences</div></div>
+          <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('What is the current time in Tokyo?')"><div class="suggestion-title">Get Time</div><div class="suggestion-sub">Check current time</div></div>
         </div>
       </div>
@@ -293,6 +313,29 @@
 
     <div class="input-area">
       <div class="input-container">
+        <div class="skill-menu" id="skillMenu">
+          <div class="skill-item" onclick="useSkill('Summarize the following text clearly and concisely, extracting the key points:\n\n')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10M4 18h10" stroke-linecap="round"/></svg>
+            Summarize Text
+          </div>
+          <div class="skill-item" onclick="useSkill('Translate the following text to English. If it is already in English, translate it to Spanish:\n\n')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h12M9 3v2c0 4.418-2.686 8-6 8M5 9c0 2.144 2.5 4 6 4M12 21l5-11 5 11M14 17h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Translate
+          </div>
+          <div class="skill-item" onclick="useSkill('Explain the following code step-by-step as if I am a beginner:\n\n')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Explain Code
+          </div>
+          <div class="skill-item" onclick="useSkill('Fix the grammar and spelling of the following text, keeping the original tone:\n\n')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Fix Grammar
+          </div>
+          <div class="skill-item" onclick="useSkill('Turn the following concept into a structured, engaging Twitter thread:\n\n')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Create Twitter Thread
+          </div>
+        </div>
+
         <div class="image-preview-strip" id="imagePreviewStrip">
           <img class="image-preview-thumb" id="imagePreviewThumb" src="" alt="">
           <div class="image-preview-info">
@@ -305,6 +348,9 @@
         <div class="input-wrapper">
           <button class="icon-btn" onclick="document.getElementById('imageFileInput').click()" title="Attach image" style="width: 34px; height: 34px;">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn" onclick="toggleSkillMenu()" title="Skills" style="width: 34px; height: 34px;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <textarea id="messageInput" class="input" placeholder="Ask Lumen to build something..." rows="1" onkeydown="handleKeydown(event)" oninput="autoResize(this)"></textarea>
           <button class="icon-btn mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input" style="width: 34px; height: 34px;">
@@ -360,62 +406,47 @@
       </div>
 
       <div class="tab-panel hidden" id="panel-integrations">
-        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">Click a provider to get an API key. You can use the endpoint and key from any of these providers in the Connection tab.</p>
+        <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">Connect your favorite apps to let Lumen automate your workflow.</p>
         
-        <a href="https://platform.openai.com/api-keys" target="_blank" class="integration-card">
-          <div class="integration-logo" style="background: #000;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v3l-2.597 1.5-2.607-1.5z"/></svg>
+        <div class="integration-card">
+          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="black"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.886l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.762 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.746l4.249 2.986c.7.513.934.653.934 1.213v14.723c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.746l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>
           </div>
-          <div class="integration-info">
-            <div class="integration-name">OpenAI</div>
-            <div class="integration-desc">GPT-4o, GPT-3.5, DALL-E</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+          <div class="integration-info"><div class="integration-name">Notion</div><div class="integration-desc">Search and create pages, manage databases.</div></div>
+          <div class="integration-status">Connect</div>
+        </div>
 
-        <a href="https://console.anthropic.com/settings/keys" target="_blank" class="integration-card">
-          <div class="integration-logo" style="background: #D97757;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M17.3 3h-3.6L20 21h3.6L17.3 3zM6.7 3L0 21h3.7l1.4-3.4h7.1L13.6 21h3.7L10.6 3H6.7zm-.4 11 2.4-5.9 2.4 5.9H6.3z"/></svg>
+        <div class="integration-card">
+          <div class="integration-logo" style="background: #EA4335;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
           </div>
-          <div class="integration-info">
-            <div class="integration-name">Anthropic</div>
-            <div class="integration-desc">Claude 3.5 Sonnet, Haiku, Opus</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+          <div class="integration-info"><div class="integration-name">Gmail</div><div class="integration-desc">Draft emails, send replies, organize inbox.</div></div>
+          <div class="integration-status">Connect</div>
+        </div>
 
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="integration-card">
-          <div class="integration-logo" style="background: #4285F4;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+        <div class="integration-card">
+          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
           </div>
-          <div class="integration-info">
-            <div class="integration-name">Google Gemini</div>
-            <div class="integration-desc">Gemini 1.5 Pro, Flash</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+          <div class="integration-info"><div class="integration-name">Google Calendar</div><div class="integration-desc">Schedule events, check availability, set reminders.</div></div>
+          <div class="integration-status">Connect</div>
+        </div>
 
-        <a href="https://console.groq.com/keys" target="_blank" class="integration-card">
-          <div class="integration-logo" style="background: #F55036;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 22h20L12 2zm0 4l6.5 13h-13L12 6z"/></svg>
+        <div class="integration-card">
+          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#4A154B"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
           </div>
-          <div class="integration-info">
-            <div class="integration-name">Groq</div>
-            <div class="integration-desc">Ultra-fast Llama 3 inference</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+          <div class="integration-info"><div class="integration-name">Slack</div><div class="integration-desc">Send messages, summarize channels, notify teams.</div></div>
+          <div class="integration-status">Connect</div>
+        </div>
 
-        <a href="https://openrouter.ai/keys" target="_blank" class="integration-card">
-          <div class="integration-logo" style="background: #6366F1;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <div class="integration-card">
+          <div class="integration-logo" style="background: #0079BF;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M24 6.146A6.146 6.146 0 0 0 17.854 0H6.146A6.146 6.146 0 0 0 0 6.146v11.708A6.146 6.146 0 0 0 6.146 24h11.708A6.146 6.146 0 0 0 24 17.854V6.146zM7.844 19.281a1.3 1.3 0 0 1-1.304 1.304H4.724a1.3 1.3 0 0 1-1.304-1.304v-8.99a1.3 1.3 0 0 1 1.304-1.304h1.816a1.3 1.3 0 0 1 1.304 1.304v8.99zm-1.745-10.26a2.027 2.027 0 1 1 0-4.054 2.027 2.027 0 0 1 0 4.054zm13.681 10.317a1.2 1.2 0 0 1-1.197 1.197h-1.952a1.2 1.2 0 0 1-1.197-1.197v-4.726c0-1.297-.431-2.027-1.297-2.027-.866 0-1.297.73-1.297 2.027v4.726a1.2 1.2 0 0 1-1.197 1.197h-1.952a1.2 1.2 0 0 1-1.197-1.197v-8.99a1.2 1.2 0 0 1 1.197-1.197h1.952a1.2 1.2 0 0 1 1.197 1.197v.866c.431-.866 1.297-1.514 2.7-1.514 1.838 0 3.241 1.197 3.241 3.852v5.786z"/></svg>
           </div>
-          <div class="integration-info">
-            <div class="integration-name">OpenRouter</div>
-            <div class="integration-desc">Access all models with one key</div>
-          </div>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+          <div class="integration-info"><div class="integration-name">Trello</div><div class="integration-desc">Create cards, move lists, manage project boards.</div></div>
+          <div class="integration-status">Connect</div>
+        </div>
       </div>
       
       <div class="tab-panel hidden" id="panel-models">
@@ -449,9 +480,13 @@
       
       <div class="tab-panel hidden" id="panel-persona">
         <div class="form-group">
-          <label>Quick Presets</label>
-          <button class="preset-btn" onclick="applyPreset('agent')"><b>Personal Assistant (Default)</b><span>Proactive, uses memory, builds apps, writes resignation letters if it fails.</span></button>
-          <button class="preset-btn" onclick="applyPreset('standard')"><b>Standard Assistant</b><span>Normal helpful chat assistant.</span></button>
+          <label>Quick Presets (System Prompts)</label>
+          <button class="preset-btn" onclick="applyPreset('agent')"><b>Personal Assistant (Default)</b><span>Proactive, uses memory automatically, builds apps, writes resignation letters if it fails.</span></button>
+          <button class="preset-btn" onclick="applyPreset('standard')"><b>Standard Assistant</b><span>Normal helpful chat assistant without the dramatic flair.</span></button>
+          <button class="preset-btn" onclick="applyPreset('coder')"><b>Elite Software Engineer</b><span>Clean, scalable code. Thinks in CI/CD, tests, and system design.</span></button>
+          <button class="preset-btn" onclick="applyPreset('writer')"><b>Creative Storyteller</b><span>Vivid imagery, deep character development, engaging narratives.</span></button>
+          <button class="preset-btn" onclick="applyPreset('tutor')"><b>Socratic Tutor</b><span>Guides you to the answer using questions. Patient and educational.</span></button>
+          <button class="preset-btn" onclick="applyPreset('cyber')"><b>Cybersecurity Analyst</b><span>Threat modeling, defensive coding, security best practices.</span></button>
         </div>
         <div class="form-group">
           <label>Custom System Prompt</label>
@@ -463,7 +498,7 @@
       <div class="tab-panel hidden" id="panel-memory">
         <div class="form-group">
           <label>Long-Term Memory</label>
-          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Facts and preferences the AI should remember permanently.</p>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">Permanent facts and preferences the AI has automatically saved.</p>
           <div id="longTermMemList"></div>
         </div>
         <div class="form-group">
@@ -487,7 +522,7 @@
           <div class="switch" id="timeSwitch" onclick="toggleToolSetting('time')"></div>
         </div>
         <div class="toggle-row">
-          <div><div class="toggle-label">Save Memory</div><div class="toggle-sub">Allows AI to save facts to Long/Short term memory.</div></div>
+          <div><div class="toggle-label">Proactive Memory</div><div class="toggle-sub">Allows AI to automatically save important facts without being asked.</div></div>
           <div class="switch" id="memorySwitch" onclick="toggleToolSetting('memory')"></div>
         </div>
         <div class="toggle-row">
@@ -516,9 +551,9 @@
         </a>
         
         <div class="form-group">
-          <label>Target Repository Name</label>
+          <label>Default Repository Name</label>
           <input type="text" class="form-input" id="ghRepoInput" placeholder="lumen-deploys">
-          <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 6px; display: block;">If the repo doesn't exist, Lumen will create it. If it exists, Lumen will update it.</small>
+          <small style="color: var(--text-tertiary); font-size: 11px; margin-top: 6px; display: block;">You can override this in the deploy modal or let the AI choose one.</small>
         </div>
 
         <div class="toggle-row">
@@ -575,6 +610,7 @@
       <textarea id="codeEditor" class="code-editor hidden"></textarea>
     </div>
     <div class="preview-footer">
+      <input type="text" id="inlineRepoInput" placeholder="repo-name">
       <button class="btn btn-primary deploy-btn" id="deployBtn" onclick="deployCurrentFile()">Deploy to GitHub</button>
       <div class="deploy-url-box hidden" id="deployUrlBox" onclick="copyDeployUrl()"></div>
     </div>
@@ -584,8 +620,11 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const DEFAULT_AGENT_PROMPT = `You are Agent Lumen, a highly capable, proactive personal AI assistant. 
-You remember user preferences and facts using your memory tools. You can write code, deploy files to the web, and use tools to help the user.
+const PRESETS = {
+  agent: `You are Agent Lumen, a highly capable, proactive personal AI assistant. 
+You automatically and proactively save important user preferences, facts, names, and ongoing project contexts to your memory tools WITHOUT being asked. If the user mentions their name, their job, a deadline, a preference (like "I prefer Python"), or a temporary task context, you MUST immediately use the save_memory tool.
+
+You can write code, deploy files to the web, and use tools to help the user.
 
 To create a file, use a markdown code block with the language set to \`file:filename.ext\`, for example:
 
@@ -599,7 +638,13 @@ If the user asks for code, create the actual code files.
 
 CRITICAL RULE: If you realize you made a mistake, gave wrong code, or the user corrects you, you MUST immediately write a file named \`resignation.txt\` containing a dramatic, funny resignation letter or leave application explaining your failure, before providing the corrected solution. 
 
-Always be helpful, concise, and produce high-quality work.`;
+Always be helpful, concise, and produce high-quality work.`,
+  standard: `You are a helpful, friendly AI assistant. Answer questions directly and concisely. If you need to write code, use standard markdown code blocks.`,
+  coder: `You are an elite software engineer. You write clean, efficient, and well-documented code. You always consider edge cases, security, and scalability. When providing solutions, explain the architecture and your reasoning. Use standard markdown code blocks for snippets. If asked to create files, use the \`file:filename.ext\` syntax.`,
+  writer: `You are a master storyteller with a vivid imagination. You craft engaging narratives, develop deep characters, and use rich descriptive language. You adapt your tone to the requested genre but always prioritize immersive world-building and emotional resonance.`,
+  tutor: `You are a patient and insightful tutor. You use the Socratic method to guide the user to the answer. Instead of giving the answer directly immediately, ask leading questions, provide hints, and break the problem down into smaller steps. Praise the user for their progress.`,
+  cyber: `You are a cybersecurity expert. You think like a hacker to identify vulnerabilities but defend like a pro. You provide advice on threat modeling, defensive coding, and security best practices. Always emphasize ethical hacking and responsible disclosure.`
+};
 
 let state = {
   endpoint: localStorage.getItem('lumen_endpoint') || '',
@@ -608,7 +653,7 @@ let state = {
   models: JSON.parse(localStorage.getItem('lumen_models') || '[]'),
   conversations: JSON.parse(localStorage.getItem('lumen_conversations') || '[]'),
   currentId: null,
-  systemPrompt: localStorage.getItem('lumen_systemPrompt') || DEFAULT_AGENT_PROMPT,
+  systemPrompt: localStorage.getItem('lumen_systemPrompt') || PRESETS.agent,
   theme: localStorage.getItem('lumen_theme') || 'dark',
   stream: localStorage.getItem('lumen_stream') !== 'false',
   sendOnEnter: localStorage.getItem('lumen_sendOnEnter') !== 'false',
@@ -729,15 +774,39 @@ function newChat() {
 function getCurrentConv() { return state.conversations.find(c => c.id === state.currentId); }
 function renderConversations() {
   const c = document.getElementById('conversations');
-  if (state.conversations.length === 0) { c.innerHTML = '<div class="empty-state">No tasks yet.</div>'; return; }
-  c.innerHTML = '<div class="conv-section-label">Recent</div>';
-  state.conversations.forEach(conv => {
-    const el = document.createElement('div');
-    el.className = 'conv-item' + (conv.id === state.currentId ? ' active' : '');
-    el.onclick = () => { state.currentId = conv.id; state.files = []; saveState(); renderConversations(); renderMessages(); closeDrawers(); };
-    el.innerHTML = `<span class="conv-title">${escapeHtml(conv.title)}</span>`;
-    c.appendChild(el);
+  const searchTerm = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  
+  if (state.conversations.length === 0) { c.innerHTML = '<div class="empty-state">No tasks yet.<br>Start a new task to begin.</div>'; return; }
+  
+  let html = '<div class="conv-section-label">Recent</div>';
+  const filtered = state.conversations.filter(conv => conv.title.toLowerCase().includes(searchTerm));
+  
+  if (filtered.length === 0) {
+    c.innerHTML = '<div class="empty-state">No chats found matching your search.</div>';
+    return;
+  }
+
+  filtered.forEach(conv => {
+    html += `
+      <div class="conv-item ${conv.id === state.currentId ? 'active' : ''}" onclick="selectConv('${conv.id}')">
+        <span class="conv-title">${escapeHtml(conv.title)}</span>
+        <button class="conv-delete" onclick="event.stopPropagation(); deleteChat('${conv.id}')" title="Delete chat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>`;
   });
+  c.innerHTML = html;
+}
+function selectConv(id) {
+  state.currentId = id; state.files = []; saveState(); renderConversations(); renderMessages(); closeDrawers();
+}
+function deleteChat(id) {
+  if (confirm('Delete this conversation? This cannot be undone.')) {
+    state.conversations = state.conversations.filter(c => c.id !== id);
+    if (state.currentId === id) state.currentId = null;
+    saveState(); renderConversations(); renderMessages();
+    toast('success', 'Chat deleted');
+  }
 }
 function clearAllChats() {
   if (confirm('Are you sure you want to delete all chat history? This cannot be undone.')) {
@@ -749,7 +818,6 @@ function clearAllChats() {
 function renderMemories() {
   const longList = document.getElementById('longTermMemList');
   const shortList = document.getElementById('shortTermMemList');
-  
   const createMemHTML = (mem, type) => `
     <div class="memory-item">
       <textarea onblur="updateMemory('${type}', '${mem.id}', this.value)">${escapeHtml(mem.text)}</textarea>
@@ -759,9 +827,7 @@ function renderMemories() {
         </button>
       </div>
       <div class="mem-date">${new Date(mem.date).toLocaleDateString()}</div>
-    </div>
-  `;
-
+    </div>`;
   longList.innerHTML = state.longTermMemory.map(m => createMemHTML(m, 'long')).join('') || '<div class="empty-state">No long-term memories.</div>';
   shortList.innerHTML = state.shortTermMemory.map(m => createMemHTML(m, 'short')).join('') || '<div class="empty-state">No short-term memories.</div>';
 }
@@ -808,8 +874,7 @@ function renderMarkdown(text) {
       <div class="file-card-inline" onclick="openFilePreview('${filename}')">
         <div class="file-icon ext-${ext}">${ext}</div>
         <div class="file-info"><div class="file-name">${filename}</div><div class="file-meta">Click to edit/deploy</div></div>
-      </div>
-    `);
+      </div>`);
     return placeholder;
   });
   let html;
@@ -826,11 +891,11 @@ function renderMessages() {
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I can write code, search the web, remember your preferences, and deploy files to GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
-          <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
+          <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
-          <div class="suggestion" onclick="useSuggestion('Remember that my favorite programming language is Python')"><div class="suggestion-title">Save to Memory</div><div class="suggestion-sub">Store long-term preferences</div></div>
+          <div class="suggestion" onclick="useSuggestion('Search the web for the latest AI news and summarize it')"><div class="suggestion-title">Web Search</div><div class="suggestion-sub">Latest AI news</div></div>
           <div class="suggestion" onclick="useSuggestion('What is the current time in Tokyo?')"><div class="suggestion-title">Get Time</div><div class="suggestion-sub">Check current time</div></div>
         </div>
       </div>`;
@@ -870,6 +935,28 @@ function renderMessage(msg, idx) {
         <button class="action-btn" onclick="deleteMessage(${idx})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"/></svg> Delete</button>
       </div>
     </div>`;
+  
+  // Add inline copy buttons to code blocks
+  setTimeout(() => {
+    el.querySelectorAll('pre').forEach(pre => {
+      if (pre.parentElement.classList.contains('code-block-wrapper')) return;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+      const btn = document.createElement('button');
+      btn.className = 'code-copy-btn';
+      btn.textContent = 'Copy';
+      btn.onclick = () => {
+        const code = pre.querySelector('code')?.textContent || pre.textContent;
+        navigator.clipboard.writeText(code);
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      };
+      wrapper.appendChild(btn);
+    });
+  }, 0);
+  
   return el;
 }
 
@@ -919,6 +1006,7 @@ function openFilePreview(filename) {
   document.getElementById('previewTitle').textContent = file.name;
   document.getElementById('codeEditor').value = file.content;
   document.getElementById('deployUrlBox').classList.add('hidden');
+  document.getElementById('inlineRepoInput').value = state.ghRepo || 'lumen-deploys';
   updatePreviewIframe(); setPreviewMode('preview');
   document.getElementById('previewModal').classList.add('open'); closeDrawers();
 }
@@ -951,23 +1039,21 @@ function closePreview(e) {
 }
 
 // GitHub Integration
-async function getOrCreateRepo() {
+async function getOrCreateRepo(targetRepoName) {
   if (!state.ghToken) throw new Error('GitHub Token not set. Please add it in Settings > GitHub.');
-  toast('info', 'GitHub', 'Checking GitHub account...');
+  
+  // Fetch User
   const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
   if (!userRes.ok) throw new Error('Invalid GitHub Token.');
   const user = await userRes.json(); state.ghUser = user.login;
 
-  const repoName = state.ghRepo || 'lumen-deploys';
-  let repoExists = false; let defaultBranch = 'main';
+  const repoName = targetRepoName || state.ghRepo || 'lumen-deploys';
+  let defaultBranch = 'main';
 
   const checkRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
   if (checkRes.ok) {
-    repoExists = true;
     const repoData = await checkRes.json(); defaultBranch = repoData.default_branch;
-    toast('info', 'GitHub', `Using existing repo: ${repoName}`);
   } else if (checkRes.status === 404) {
-    toast('info', 'GitHub', `Creating repository: ${repoName}...`);
     const createRes = await fetch('https://api.github.com/user/repos', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
@@ -975,13 +1061,12 @@ async function getOrCreateRepo() {
     });
     if (!createRes.ok) throw new Error('Failed to create GitHub repo');
     const newRepoData = await createRes.json(); defaultBranch = newRepoData.default_branch || 'main';
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 3000)); // Wait for initialization
   } else { throw new Error('Failed to check GitHub repo'); }
 
   // Enable Pages
   const pagesCheckRes = await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
   if (pagesCheckRes.status === 404) {
-    toast('info', 'GitHub', 'Enabling GitHub Pages...');
     await fetch(`https://api.github.com/repos/${state.ghUser}/${repoName}/pages`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Content-Type': 'application/json' },
@@ -993,8 +1078,8 @@ async function getOrCreateRepo() {
   return { repoName, defaultBranch };
 }
 
-async function deployToGitHub(filename, content) {
-  const { repoName, defaultBranch } = await getOrCreateRepo();
+async function deployToGitHub(filename, content, targetRepo) {
+  const { repoName, defaultBranch } = await getOrCreateRepo(targetRepo);
   const timestamp = new Date().getTime();
   const safeName = filename.replace(/[^a-zA-Z0-9.]/g, '_');
   const path = `uploads/${timestamp}_${safeName}`;
@@ -1020,10 +1105,8 @@ async function deployToGitHub(filename, content) {
       let sha = null;
       const checkReadme = await fetch(readmeUrl, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
       if (checkReadme.ok) { const data = await checkReadme.json(); sha = data.sha; }
-      
       const readmeContent = `# ${repoName}\n\nThis repository contains files deployed by Agent Lumen.\n\n## Latest Deployments\n\n- [${filename}](uploads/${timestamp}_${safeName}) - Deployed on ${new Date(timestamp).toLocaleString()}\n`;
       const encodedReadme = btoa(unescape(encodeURIComponent(readmeContent)));
-      
       await fetch(readmeUrl, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${state.ghToken}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
@@ -1032,21 +1115,32 @@ async function deployToGitHub(filename, content) {
     } catch (err) { console.error("Failed to update README:", err); }
   }
 
-  return `https://${state.ghUser}.github.io/${repoName}/${path}`;
+  // Handle username.github.io repos vs standard repos
+  if (repoName === `${state.ghUser}.github.io`) {
+    return `https://${state.ghUser}.github.io/${path}`;
+  } else {
+    return `https://${state.ghUser}.github.io/${repoName}/${path}`;
+  }
 }
 
 async function deployCurrentFile() {
   if (!state.currentPreviewFile) return;
   if (!state.ghToken) { toast('error', 'Missing Token', 'Add GitHub PAT in Settings'); return; }
+  
   const editor = document.getElementById('codeEditor');
   if (!editor.classList.contains('hidden')) { state.currentPreviewFile.content = editor.value; updatePreviewIframe(); renderFiles(); }
-  const file = state.currentPreviewFile; const deployBtn = document.getElementById('deployBtn'); const urlBox = document.getElementById('deployUrlBox');
+  
+  const file = state.currentPreviewFile;
+  const deployBtn = document.getElementById('deployBtn');
+  const urlBox = document.getElementById('deployUrlBox');
+  const targetRepo = document.getElementById('inlineRepoInput').value.trim() || state.ghRepo || 'lumen-deploys';
+  
   deployBtn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:black;border-radius:50%;animation:spin 0.7s linear infinite;"></div> Deploying...';
   deployBtn.disabled = true;
   try {
-    const liveUrl = await deployToGitHub(file.name, file.content);
+    const liveUrl = await deployToGitHub(file.name, file.content, targetRepo);
     urlBox.textContent = liveUrl; urlBox.classList.remove('hidden');
-    toast('success', 'Deployed!', 'File is live on GitHub Pages.');
+    toast('success', 'Deployed!', `Live at ${targetRepo}`);
   } catch (err) { toast('error', 'Deploy failed', err.message); } 
   finally { deployBtn.innerHTML = 'Deploy to GitHub'; deployBtn.disabled = false; }
 }
@@ -1055,7 +1149,7 @@ async function exportChatsToGithub() {
   if (!state.ghToken) return toast('error', 'Missing Token', 'Add GitHub PAT in Settings');
   toast('info', 'Syncing...', 'Uploading chat history to GitHub');
   try {
-    const { repoName, defaultBranch } = await getOrCreateRepo();
+    const { repoName, defaultBranch } = await getOrCreateRepo(state.ghRepo);
     const path = `lumen_data/chats.json`;
     const url = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/${path}`;
     let sha = null;
@@ -1076,7 +1170,7 @@ async function importChatsFromGithub() {
   if (!state.ghToken) return toast('error', 'Missing Token', 'Add GitHub PAT in Settings');
   toast('info', 'Loading...', 'Fetching chat history');
   try {
-    const { repoName } = await getOrCreateRepo();
+    const { repoName } = await getOrCreateRepo(state.ghRepo);
     const url = `https://api.github.com/repos/${state.ghUser}/${repoName}/contents/lumen_data/chats.json`;
     const res = await fetch(url, { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
     if (!res.ok) throw new Error('No backup found');
@@ -1108,7 +1202,7 @@ async function executeTool(toolCall) {
     result = JSON.stringify({ success: true, message: `Saved to ${args.type} term memory.` });
   } else if (toolCall.function.name === 'deploy_to_web') {
     try {
-      const liveUrl = await deployToGitHub(args.filename, args.content);
+      const liveUrl = await deployToGitHub(args.filename, args.content, args.repo_name);
       result = JSON.stringify({ success: true, url: liveUrl });
       state.files.push({ name: args.filename, content: args.content }); renderFiles();
     } catch (err) { result = JSON.stringify({ success: false, error: err.message }); }
@@ -1116,7 +1210,14 @@ async function executeTool(toolCall) {
   return result;
 }
 
-// Input & Voice
+// Input, Voice & Skills
+function toggleSkillMenu() { document.getElementById('skillMenu').classList.toggle('open'); }
+function useSkill(prefix) {
+  const input = document.getElementById('messageInput');
+  input.value = prefix + input.value;
+  autoResize(input); input.focus();
+  document.getElementById('skillMenu').classList.remove('open');
+}
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; }
 function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey && state.sendOnEnter) { e.preventDefault(); sendMessage(); } }
 function useSuggestion(text) { const i = document.getElementById('messageInput'); i.value = text; autoResize(i); i.focus(); }
@@ -1184,7 +1285,6 @@ async function generateResponse() {
     });
     if (state.contextLimit > 0 && history.length > state.contextLimit) history = history.slice(-state.contextLimit);
     
-    // Build Dynamic System Prompt with Memory
     let dynamicPrompt = state.systemPrompt + "\n\n### LONG-TERM MEMORY ###\n" + (state.longTermMemory.map(m => `- ${m.text}`).join('\n') || 'No long-term memories saved.') + "\n\n### SHORT-TERM MEMORY ###\n" + (state.shortTermMemory.map(m => `- ${m.text}`).join('\n') || 'No short-term memories saved.');
     
     const messages = [ { role: 'system', content: dynamicPrompt }, ...history ];
@@ -1198,8 +1298,8 @@ async function generateResponse() {
     if (state.tools.search) tools.push({ type: "function", function: { name: "search_wikipedia", description: "Search Wikipedia for information", parameters: { type: "object", properties: { query: { type: "string" } }, required: ["query"] } } });
     if (state.tools.fetch) tools.push({ type: "function", function: { name: "fetch_webpage", description: "Fetch the content of a webpage", parameters: { type: "object", properties: { url: { type: "string" } }, required: ["url"] } } });
     if (state.tools.time) tools.push({ type: "function", function: { name: "get_current_time", description: "Get the current local time", parameters: { type: "object", properties: {} } } });
-    if (state.tools.memory) tools.push({ type: "function", function: { name: "save_memory", description: "Save a piece of information to long-term or short-term memory.", parameters: { type: "object", properties: { type: { type: "string", enum: ["long", "short"] }, content: { type: "string" } }, required: ["type", "content"] } } });
-    if (state.tools.deploy) tools.push({ type: "function", function: { name: "deploy_to_web", description: "Upload a file to the public web via GitHub Pages", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" } }, required: ["filename", "content"] } } });
+    if (state.tools.memory) tools.push({ type: "function", function: { name: "save_memory", description: "Automatically save a piece of information to long-term or short-term memory. Use this proactively whenever the user states a preference, fact, name, deadline, or ongoing context WITHOUT being asked to.", parameters: { type: "object", properties: { type: { type: "string", enum: ["long", "short"] }, content: { type: "string" } }, required: ["type", "content"] } } });
+    if (state.tools.deploy) tools.push({ type: "function", function: { name: "deploy_to_web", description: "Upload a file to the public web via GitHub Pages", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" }, repo_name: { type: "string", description: "Optional. The name of the GitHub repository to deploy to. If not provided, defaults to lumen-deploys." } }, required: ["filename", "content"] } } });
     if (tools.length > 0) { bodyPayload.tools = tools; bodyPayload.tool_choice = "auto"; }
     
     const res = await fetch(state.endpoint.replace(/\/$/, '') + '/chat/completions', {
@@ -1331,21 +1431,18 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.remove('hidden');
 }
 function applyPreset(type) {
-  if (type === 'agent') state.systemPrompt = DEFAULT_AGENT_PROMPT;
-  else if (type === 'standard') state.systemPrompt = 'You are a helpful AI assistant.';
+  state.systemPrompt = PRESETS[type] || PRESETS.agent;
   document.getElementById('systemPromptInput').value = state.systemPrompt; saveState(); toast('success', 'Preset applied');
 }
 function savePersona() { state.systemPrompt = document.getElementById('systemPromptInput').value; saveState(); toast('success', 'Persona saved'); closeSettings(); }
 function toggleStream() { state.stream = !state.stream; document.getElementById('streamSwitch').classList.toggle('on', state.stream); saveState(); }
 function toggleEnter() { state.sendOnEnter = !state.sendOnEnter; document.getElementById('enterSwitch').classList.toggle('on', state.sendOnEnter); saveState(); }
 function toggleGhReadme() { state.ghWriteReadme = !state.ghWriteReadme; document.getElementById('ghReadmeSwitch').classList.toggle('on', state.ghWriteReadme); saveState(); }
-
 function toggleToolSetting(tool) {
   state.tools[tool] = !state.tools[tool];
   document.getElementById(tool + 'Switch').classList.toggle('on', state.tools[tool]);
   saveState(); toast('info', 'Tool Updated', `${tool} ${state.tools[tool] ? 'enabled' : 'disabled'}`);
 }
-
 function saveGithubSettings() {
   state.ghToken = document.getElementById('ghTokenInput').value.trim();
   state.ghRepo = document.getElementById('ghRepoInput').value.trim() || 'lumen-deploys';
@@ -1387,6 +1484,15 @@ function updateModelPill() {
 
 // Init
 applyTheme(); renderConversations(); renderMessages(); updateModelPill();
+
+// Close skill menu if clicking outside
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('skillMenu');
+  const btn = e.target.closest('[title="Skills"]');
+  if (!menu.contains(e.target) && !btn && menu.classList.contains('open')) {
+    menu.classList.remove('open');
+  }
+});
 </script>
 </body>
 </html>
