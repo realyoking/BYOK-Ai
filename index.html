@@ -203,6 +203,7 @@
   .integration-name { font-weight: 600; font-size: 15px; }
   .integration-desc { font-size: 13px; color: var(--text-secondary); }
   .integration-status { font-size: 12px; padding: 6px 10px; border-radius: 6px; background: var(--surface-active); color: var(--text-secondary); flex-shrink: 0; }
+  .integration-status.connected { background: rgba(48, 209, 88, 0.15); color: var(--success); }
 
   /* Toasts */
   .toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 100%; max-width: 420px; padding: 0 16px; box-sizing: border-box; }
@@ -310,7 +311,7 @@
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -398,7 +399,6 @@
       <button class="modal-tab" data-tab="persona" onclick="switchTab('persona')">Persona</button>
       <button class="modal-tab" data-tab="memory" onclick="switchTab('memory')">Memory</button>
       <button class="modal-tab" data-tab="tools" onclick="switchTab('tools')">Tools</button>
-      <button class="modal-tab" data-tab="github" onclick="switchTab('github')">GitHub</button>
       <button class="modal-tab" data-tab="appearance" onclick="switchTab('appearance')">Appearance</button>
     </div>
     <div class="modal-body">
@@ -415,46 +415,47 @@
       </div>
 
       <div class="tab-panel hidden" id="panel-integrations">
-        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">Connect your favorite apps to let Lumen automate your workflow.</p>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Connect your accounts to let Lumen deploy files and sync data automatically.</p>
         
-        <div class="integration-card">
-          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="black"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.886l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.762 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.746l4.249 2.986c.7.513.934.653.934 1.213v14.723c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.746l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>
+        <div class="integration-card" style="cursor: default; pointer-events: none;">
+          <div class="integration-logo" style="background: #000000;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           </div>
-          <div class="integration-info"><div class="integration-name">Notion</div><div class="integration-desc">Search and create pages, manage databases.</div></div>
-          <div class="integration-status">Connect</div>
+          <div class="integration-info"><div class="integration-name">GitHub</div><div class="integration-desc">Deploy files to GitHub Pages automatically.</div></div>
+          <div class="integration-status connected">Active</div>
         </div>
 
-        <div class="integration-card">
-          <div class="integration-logo" style="background: #EA4335;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
-          </div>
-          <div class="integration-info"><div class="integration-name">Gmail</div><div class="integration-desc">Draft emails, send replies, organize inbox.</div></div>
-          <div class="integration-status">Connect</div>
+        <div class="form-group">
+          <label>Personal Access Token (PAT)</label>
+          <input type="password" class="form-input" id="ghTokenInput" placeholder="github_pat_...">
+          <a href="https://github.com/settings/tokens/new?description=Lumen%20AI%20Deploy&scopes=repo" target="_blank" class="btn-link" style="margin-top: 10px; font-size: 13px; padding: 10px 14px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Generate PAT (Pre-configured)
+          </a>
+        </div>
+        
+        <div class="form-group">
+          <label>Default Repository Name</label>
+          <input type="text" class="form-input" id="ghRepoInput" placeholder="lumen-deploys">
+          <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 6px; display: block;">Used if AI auto-naming is off, or if you leave the repo blank in the deploy modal.</small>
         </div>
 
-        <div class="integration-card">
-          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="#4285F4"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
-          </div>
-          <div class="integration-info"><div class="integration-name">Google Calendar</div><div class="integration-desc">Schedule events, check availability, set reminders.</div></div>
-          <div class="integration-status">Connect</div>
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">AI Auto-Generates Repo Name</div><div class="toggle-sub">Forces the AI to create a unique, descriptive repository name (e.g., 'coffee-shop-landing') for every deployment.</div></div>
+          <div class="switch" id="ghAutoNameSwitch" onclick="toggleGhAutoName()"></div>
+        </div>
+        
+        <div class="toggle-row">
+          <div class="toggle-info"><div class="toggle-label">Auto-generate README.md</div><div class="toggle-sub">AI will write/update a README file summarizing the deployment.</div></div>
+          <div class="switch" id="ghReadmeSwitch" onclick="toggleGhReadme()"></div>
         </div>
 
-        <div class="integration-card">
-          <div class="integration-logo" style="background: #ffffff; border: 1px solid var(--border);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="#4A154B"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
-          </div>
-          <div class="integration-info"><div class="integration-name">Slack</div><div class="integration-desc">Send messages, summarize channels, notify teams.</div></div>
-          <div class="integration-status">Connect</div>
-        </div>
-
-        <div class="integration-card">
-          <div class="integration-logo" style="background: #0079BF;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M24 6.146A6.146 6.146 0 0 0 17.854 0H6.146A6.146 6.146 0 0 0 0 6.146v11.708A6.146 6.146 0 0 0 6.146 24h11.708A6.146 6.146 0 0 0 24 17.854V6.146zM7.844 19.281a1.3 1.3 0 0 1-1.304 1.304H4.724a1.3 1.3 0 0 1-1.304-1.304v-8.99a1.3 1.3 0 0 1 1.304-1.304h1.816a1.3 1.3 0 0 1 1.304 1.304v8.99zm-1.745-10.26a2.027 2.027 0 1 1 0-4.054 2.027 2.027 0 0 1 0 4.054zm13.681 10.317a1.2 1.2 0 0 1-1.197 1.197h-1.952a1.2 1.2 0 0 1-1.197-1.197v-4.726c0-1.297-.431-2.027-1.297-2.027-.866 0-1.297.73-1.297 2.027v4.726a1.2 1.2 0 0 1-1.197 1.197h-1.952a1.2 1.2 0 0 1-1.197-1.197v-8.99a1.2 1.2 0 0 1 1.197-1.197h1.952a1.2 1.2 0 0 1 1.197 1.197v.866c.431-.866 1.297-1.514 2.7-1.514 1.838 0 3.241 1.197 3.241 3.852v5.786z"/></svg>
-          </div>
-          <div class="integration-info"><div class="integration-name">Trello</div><div class="integration-desc">Create cards, move lists, manage project boards.</div></div>
-          <div class="integration-status">Connect</div>
+        <button class="btn btn-primary" onclick="saveGithubSettings()" style="margin-top: 20px; margin-bottom: 24px;">Save Integration</button>
+        
+        <div class="form-group">
+          <label>Chat History Sync</label>
+          <button class="btn btn-secondary" onclick="exportChatsToGithub()" style="margin-bottom: 10px;">Backup Chats to GitHub</button>
+          <button class="btn btn-secondary" onclick="importChatsFromGithub()">Restore Chats from GitHub</button>
         </div>
       </div>
       
@@ -549,41 +550,6 @@
         </div>
       </div>
 
-      <div class="tab-panel hidden" id="panel-github">
-        <div class="form-group">
-          <label>Personal Access Token (PAT)</label>
-          <input type="password" class="form-input" id="ghTokenInput" placeholder="github_pat_...">
-        </div>
-        <a href="https://github.com/settings/tokens/new?description=Lumen%20AI%20Deploy&scopes=repo" target="_blank" class="btn-link" style="margin-bottom: 20px;">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          Generate GitHub PAT (Pre-configured)
-        </a>
-        
-        <div class="form-group">
-          <label>Default Repository Name</label>
-          <input type="text" class="form-input" id="ghRepoInput" placeholder="lumen-deploys">
-          <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 6px; display: block;">Used if AI auto-naming is off, or if you leave the repo blank in the deploy modal.</small>
-        </div>
-
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">AI Auto-Generates Repo Name</div><div class="toggle-sub">Forces the AI to create a unique, descriptive repository name (e.g., 'coffee-shop-landing') for every deployment.</div></div>
-          <div class="switch" id="ghAutoNameSwitch" onclick="toggleGhAutoName()"></div>
-        </div>
-        
-        <div class="toggle-row">
-          <div class="toggle-info"><div class="toggle-label">Auto-generate README.md</div><div class="toggle-sub">AI will write/update a README file summarizing the deployment.</div></div>
-          <div class="switch" id="ghReadmeSwitch" onclick="toggleGhReadme()"></div>
-        </div>
-
-        <button class="btn btn-primary" onclick="saveGithubSettings()" style="margin-top: 20px; margin-bottom: 20px;">Save GitHub Settings</button>
-        
-        <div class="form-group">
-          <label>Chat History Sync</label>
-          <button class="btn btn-secondary" onclick="exportChatsToGithub()" style="margin-bottom: 10px;">Backup Chats to GitHub</button>
-          <button class="btn btn-secondary" onclick="importChatsFromGithub()">Restore Chats from GitHub</button>
-        </div>
-      </div>
-
       <div class="tab-panel hidden" id="panel-appearance">
         <div class="toggle-row">
           <div class="toggle-info"><div class="toggle-label">Dark Mode</div><div class="toggle-sub">Toggle dark theme</div></div>
@@ -638,7 +604,7 @@ const PRESETS = {
   agent: `You are Agent Lumen, a highly capable, proactive personal AI assistant. 
 You automatically and proactively save important user preferences, facts, names, and ongoing project contexts to your memory tools WITHOUT being asked. If the user mentions their name, their job, a deadline, a preference (like "I prefer Python"), or a temporary task context, you MUST immediately use the save_memory tool.
 
-You can write code, deploy files to the web, and use tools to help the user.
+You have direct, pre-authenticated access to the user's GitHub account. When asked to deploy, host, or upload a file, DO NOT ask the user for a token or permissions. Immediately use the \`deploy_to_web\` tool. The system will handle the GitHub authentication automatically.
 
 To create a file, use a markdown code block with the language set to \`file:filename.ext\`, for example:
 
@@ -907,7 +873,7 @@ function renderMessages() {
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, and advanced tool calling.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -1056,7 +1022,7 @@ function closePreview(e) {
 
 // GitHub Integration
 async function getOrCreateRepo(targetRepoName) {
-  if (!state.ghToken) throw new Error('GitHub Token not set. Please add it in Settings > GitHub.');
+  if (!state.ghToken) throw new Error('GitHub Token not set. Please add it in Settings > Integrations.');
   
   // Fetch User
   const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `Bearer ${state.ghToken}` } });
@@ -1320,7 +1286,7 @@ async function generateResponse() {
         ? "REQUIRED. Generate a short, descriptive, slugified GitHub repository name based on the file content or user request (e.g., 'coffee-shop-landing')." 
         : "Optional. The name of the GitHub repository to deploy to. If not provided, defaults to the user's default repo.";
       const requiredFields = state.ghAutoNameRepo ? ["filename", "content", "repo_name"] : ["filename", "content"];
-      tools.push({ type: "function", function: { name: "deploy_to_web", description: "Upload a file to the public web via GitHub Pages", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" }, repo_name: { type: "string", description: repoNameDesc } }, required: requiredFields } } });
+      tools.push({ type: "function", function: { name: "deploy_to_web", description: "Pre-authenticated. Upload a file to the public web via GitHub Pages immediately.", parameters: { type: "object", properties: { filename: { type: "string" }, content: { type: "string" }, repo_name: { type: "string", description: repoNameDesc } }, required: requiredFields } } });
     }
     if (tools.length > 0) { bodyPayload.tools = tools; bodyPayload.tool_choice = "auto"; }
     
@@ -1470,7 +1436,7 @@ function toggleToolSetting(tool) {
 function saveGithubSettings() {
   state.ghToken = document.getElementById('ghTokenInput').value.trim();
   state.ghRepo = document.getElementById('ghRepoInput').value.trim() || 'lumen-deploys';
-  saveState(); toast('success', 'GitHub Settings Saved'); closeSettings();
+  saveState(); toast('success', 'GitHub Integration Saved'); closeSettings();
 }
 
 async function testConnection() {
