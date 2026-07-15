@@ -119,6 +119,16 @@
   .code-block-wrapper { position: relative; }
   .code-copy-btn { position: absolute; top: 8px; right: 8px; padding: 5px 10px; background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; font-size: 12px; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
   .code-block-wrapper:hover .code-copy-btn { opacity: 1; }
+  
+  /* DeepSeek Style Thinking Block */
+  .thinking-block { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; overflow: hidden; background: var(--surface); }
+  .thinking-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer; font-size: 13px; color: var(--text-secondary); font-weight: 500; user-select: none; }
+  .thinking-header:hover { background: var(--surface-hover); }
+  .thinking-header .chevron { margin-left: auto; transition: transform 0.2s; }
+  .thinking-block.expanded .thinking-header .chevron { transform: rotate(180deg); }
+  .thinking-content { padding: 0 14px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); border-top: 1px solid transparent; }
+  .thinking-block.expanded .thinking-content { max-height: 1000px; padding: 14px; border-top-color: var(--border); overflow-y: auto; }
+
   .action-btn { padding: 6px 10px; background: transparent; border: none; border-radius: 6px; color: var(--text-tertiary); font-family: inherit; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
   .action-btn:hover { background: var(--surface-hover); color: var(--text); }
   .typing { display: flex; gap: 4px; padding: 8px 0; }
@@ -153,6 +163,7 @@
   .send-btn:hover:not(:disabled) { background: var(--accent-hover); transform: scale(1.05); }
   .send-btn.stop { background: var(--danger); }
   .mic-btn.recording { background: var(--danger); color: white; animation: pulse 1.5s infinite; }
+  .think-btn.active { background: var(--accent-soft); color: var(--accent); }
   @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 69, 58, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0); } }
 
   /* Modal - Refactored for Stability */
@@ -311,7 +322,7 @@
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, advanced tool calling, and deep thinking.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -361,6 +372,9 @@
           </button>
           <button class="icon-btn" onclick="toggleSkillMenu()" title="Skills" style="width: 38px; height: 38px;">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="icon-btn think-btn" id="thinkBtn" onclick="toggleThinkingMode()" title="Thinking Mode" style="width: 38px; height: 38px;">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <textarea id="messageInput" class="input" placeholder="Ask Lumen to build something..." rows="1" onkeydown="handleKeydown(event)" oninput="autoResize(this)"></textarea>
           <button class="icon-btn mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input" style="width: 38px; height: 38px;">
@@ -500,7 +514,12 @@
         </div>
         <div class="form-group">
           <label>Custom System Prompt</label>
-          <textarea class="form-input" id="systemPromptInput" rows="8" style="font-family: monospace; font-size: 13px;"></textarea>
+          <textarea class="form-input" id="systemPromptInput" rows="6" style="font-family: monospace; font-size: 13px;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Thinking Mode Prompt</label>
+          <textarea class="form-input" id="thinkingPromptInput" rows="4" style="font-family: monospace; font-size: 13px;" placeholder="Injected when Thinking Mode is ON."></textarea>
+          <small style="color: var(--text-tertiary); font-size: 12px; margin-top: 6px; display: block;">Tells the AI to use &lt;think&gt; tags to reason and check mistakes before answering.</small>
         </div>
         <button class="btn btn-primary" onclick="savePersona()">Save Persona</button>
       </div>
@@ -626,6 +645,11 @@ Always be helpful, concise, and produce high-quality work.`,
   cyber: `You are a cybersecurity expert. You think like a hacker to identify vulnerabilities but defend like a pro. You provide advice on threat modeling, defensive coding, and security best practices. Always emphasize ethical hacking and responsible disclosure.`
 };
 
+const DEFAULT_THINKING_PROMPT = `THINKING MODE ENABLED. Before providing your final response, you MUST output your thought process inside <think>...</think> XML tags. 
+Inside these tags, analyze the problem, write down your steps, check your logic for mistakes, and correct yourself if needed. 
+Only after closing the </think> tag should you provide the actual response to the user. 
+Do not mention the thinking tags in your final answer.`;
+
 let state = {
   endpoint: localStorage.getItem('lumen_endpoint') || '',
   apiKey: localStorage.getItem('lumen_apiKey') || '',
@@ -634,6 +658,8 @@ let state = {
   conversations: JSON.parse(localStorage.getItem('lumen_conversations') || '[]'),
   currentId: null,
   systemPrompt: localStorage.getItem('lumen_systemPrompt') || PRESETS.agent,
+  thinkingPrompt: localStorage.getItem('lumen_thinkingPrompt') || DEFAULT_THINKING_PROMPT,
+  thinkingMode: localStorage.getItem('lumen_thinkingMode') === 'true',
   theme: localStorage.getItem('lumen_theme') || 'dark',
   stream: localStorage.getItem('lumen_stream') !== 'false',
   sendOnEnter: localStorage.getItem('lumen_sendOnEnter') !== 'false',
@@ -684,6 +710,8 @@ function saveState() {
   localStorage.setItem('lumen_models', JSON.stringify(state.models));
   localStorage.setItem('lumen_conversations', JSON.stringify(state.conversations));
   localStorage.setItem('lumen_systemPrompt', state.systemPrompt);
+  localStorage.setItem('lumen_thinkingPrompt', state.thinkingPrompt);
+  localStorage.setItem('lumen_thinkingMode', state.thinkingMode);
   localStorage.setItem('lumen_theme', state.theme);
   localStorage.setItem('lumen_stream', state.stream);
   localStorage.setItem('lumen_sendOnEnter', state.sendOnEnter);
@@ -846,9 +874,42 @@ function extractFilesFromConv(conv) {
 
 function renderMarkdown(text) {
   if (!text) return '';
+  
+  let thinkingHtml = '';
+  let finalText = text;
+  
+  // Parse DeepSeek-style thinking blocks
+  const thinkRegex = /<think>([\s\S]*?)(<\/think>|$)/g;
+  let match;
+  const thinkBlocks = [];
+  while ((match = thinkRegex.exec(text)) !== null) {
+    thinkBlocks.push(match[1].trim());
+  }
+  
+  if (thinkBlocks.length > 0) {
+    const endThinkIndex = text.indexOf('</think>');
+    if (endThinkIndex !== -1) {
+      finalText = text.substring(endThinkIndex + 8).trim();
+    } else {
+      finalText = ''; // Still thinking, no final text yet
+    }
+    
+    thinkingHtml = thinkBlocks.map(tb => `
+      <div class="thinking-block">
+        <div class="thinking-header" onclick="this.parentElement.classList.toggle('expanded')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Thought Process</span>
+          <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="thinking-content">${escapeHtml(tb)}</div>
+      </div>
+    `).join('');
+  }
+  
+  // Process finalText for files and markdown
   const placeholders = [];
   const fileRegex = /```file:\s*([^\n]+)\s*\n([\s\S]*?)```/g;
-  let tempText = text.replace(fileRegex, (m, p1, p2) => {
+  let tempText = finalText.replace(fileRegex, (m, p1, p2) => {
     const filename = p1.trim();
     const ext = filename.split('.').pop().slice(0,4).toLowerCase();
     const placeholder = `[[FILE_PLACEHOLDER_${placeholders.length}]]`;
@@ -860,9 +921,10 @@ function renderMarkdown(text) {
     return placeholder;
   });
   let html;
-  try { html = marked.parse(tempText); } catch(e) { html = `<p>${escapeHtml(text)}</p>`; }
+  try { html = marked.parse(tempText); } catch(e) { html = `<p>${escapeHtml(tempText)}</p>`; }
   placeholders.forEach((p, i) => { html = html.replace(`<p>[[FILE_PLACEHOLDER_${i}]]</p>`, p); html = html.replace(`[[FILE_PLACEHOLDER_${i}]]`, p); });
-  return html;
+  
+  return thinkingHtml + html;
 }
 
 function renderMessages() {
@@ -873,7 +935,7 @@ function renderMessages() {
       <div class="welcome" id="welcome">
         <div class="welcome-icon">A</div>
         <h1>Agent Lumen</h1>
-        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, and advanced tool calling.</p>
+        <p>I am your personal AI assistant. I will proactively remember your preferences, write code, search the web, and deploy files directly to your GitHub. I support image inputs, voice, advanced tool calling, and deep thinking.</p>
         <div class="suggestions">
           <div class="suggestion" onclick="useSuggestion('My name is Alex and I prefer using TypeScript for all frontend projects.')"><div class="suggestion-title">Tell me about yourself</div><div class="suggestion-sub">I will automatically save it</div></div>
           <div class="suggestion" onclick="useSuggestion('Create a simple HTML landing page for a coffee shop and deploy it')"><div class="suggestion-title">Build & Deploy</div><div class="suggestion-sub">Coffee shop landing page</div></div>
@@ -1200,6 +1262,12 @@ function useSkill(prefix) {
   autoResize(input); input.focus();
   document.getElementById('skillMenu').classList.remove('open');
 }
+function toggleThinkingMode() {
+  state.thinkingMode = !state.thinkingMode;
+  document.getElementById('thinkBtn').classList.toggle('active', state.thinkingMode);
+  saveState();
+  toast('info', 'Thinking Mode', state.thinkingMode ? 'Enabled' : 'Disabled');
+}
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 200) + 'px'; }
 function handleKeydown(e) { if (e.key === 'Enter' && !e.shiftKey && state.sendOnEnter) { e.preventDefault(); sendMessage(); } }
 function useSuggestion(text) { const i = document.getElementById('messageInput'); i.value = text; autoResize(i); i.focus(); }
@@ -1267,7 +1335,11 @@ async function generateResponse() {
     });
     if (state.contextLimit > 0 && history.length > state.contextLimit) history = history.slice(-state.contextLimit);
     
-    let dynamicPrompt = state.systemPrompt + "\n\n### LONG-TERM MEMORY ###\n" + (state.longTermMemory.map(m => `- ${m.text}`).join('\n') || 'No long-term memories saved.') + "\n\n### SHORT-TERM MEMORY ###\n" + (state.shortTermMemory.map(m => `- ${m.text}`).join('\n') || 'No short-term memories saved.');
+    let dynamicPrompt = state.systemPrompt;
+    if (state.thinkingMode) {
+      dynamicPrompt += "\n\n" + state.thinkingPrompt;
+    }
+    dynamicPrompt += "\n\n### LONG-TERM MEMORY ###\n" + (state.longTermMemory.map(m => `- ${m.text}`).join('\n') || 'No long-term memories saved.') + "\n\n### SHORT-TERM MEMORY ###\n" + (state.shortTermMemory.map(m => `- ${m.text}`).join('\n') || 'No short-term memories saved.');
     
     const messages = [ { role: 'system', content: dynamicPrompt }, ...history ];
     const bodyPayload = {
@@ -1384,6 +1456,7 @@ function openSettings(tab = 'connection') {
   document.getElementById('endpointInput').value = state.endpoint;
   document.getElementById('apiKeyInput').value = state.apiKey;
   document.getElementById('systemPromptInput').value = state.systemPrompt;
+  document.getElementById('thinkingPromptInput').value = state.thinkingPrompt;
   document.getElementById('tempInput').value = state.temperature; document.getElementById('tempValue').innerText = state.temperature;
   document.getElementById('topPInput').value = state.topP; document.getElementById('topPValue').innerText = state.topP;
   document.getElementById('freqPenaltyInput').value = state.freqPenalty; document.getElementById('freqPenaltyValue').innerText = state.freqPenalty;
@@ -1401,6 +1474,7 @@ function openSettings(tab = 'connection') {
   document.getElementById('deploySwitch').classList.toggle('on', state.tools.deploy);
   document.getElementById('ghReadmeSwitch').classList.toggle('on', state.ghWriteReadme);
   document.getElementById('ghAutoNameSwitch').classList.toggle('on', state.ghAutoNameRepo);
+  document.getElementById('thinkBtn').classList.toggle('active', state.thinkingMode);
   
   switchTab(tab); renderModelList(); renderMemories();
   document.getElementById('settingsModal').classList.add('open'); closeDrawers();
@@ -1423,7 +1497,11 @@ function applyPreset(type) {
   state.systemPrompt = PRESETS[type] || PRESETS.agent;
   document.getElementById('systemPromptInput').value = state.systemPrompt; saveState(); toast('success', 'Preset applied');
 }
-function savePersona() { state.systemPrompt = document.getElementById('systemPromptInput').value; saveState(); toast('success', 'Persona saved'); closeSettings(); }
+function savePersona() { 
+  state.systemPrompt = document.getElementById('systemPromptInput').value; 
+  state.thinkingPrompt = document.getElementById('thinkingPromptInput').value || DEFAULT_THINKING_PROMPT;
+  saveState(); toast('success', 'Persona saved'); closeSettings(); 
+}
 function toggleStream() { state.stream = !state.stream; document.getElementById('streamSwitch').classList.toggle('on', state.stream); saveState(); }
 function toggleEnter() { state.sendOnEnter = !state.sendOnEnter; document.getElementById('enterSwitch').classList.toggle('on', state.sendOnEnter); saveState(); }
 function toggleGhReadme() { state.ghWriteReadme = !state.ghWriteReadme; document.getElementById('ghReadmeSwitch').classList.toggle('on', state.ghWriteReadme); saveState(); }
@@ -1474,6 +1552,7 @@ function updateModelPill() {
 
 // Init
 applyTheme(); renderConversations(); renderMessages(); updateModelPill();
+document.getElementById('thinkBtn').classList.toggle('active', state.thinkingMode);
 
 // Close skill menu if clicking outside
 document.addEventListener('click', (e) => {
